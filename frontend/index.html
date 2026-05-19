@@ -387,65 +387,79 @@
                 geometry: "plane",
                 canvasSetup: (canvas, frame) => { 
                     canvas.setBackgroundImage(null, () => {
-                    const baseW = 425;
-                    const baseH = 1100;
-                    const cr = 25; 
-                    const hr = 125; 
-                    const cx = baseW / 2;
-                    const cy = 200; 
-                    const slitY = cy - 20;
-
-                    let p = `M ${cr} 0 `; 
-                    p += `L ${baseW-cr} 0 A ${cr} ${cr} 0 0 1 ${baseW} ${cr} `; 
-                    p += `L ${baseW} ${baseH-cr} A ${cr} ${cr} 0 0 1 ${baseW-cr} ${baseH} `; 
-                    p += `L ${cr} ${baseH} A ${cr} ${cr} 0 0 1 0 ${baseH-cr} `; 
-                    p += `L 0 ${cr} A ${cr} ${cr} 0 0 1 ${cr} 0 Z `; 
-
-                    p += `M ${cx} ${cy-hr} `;
-                    p += `A ${hr} ${hr} 0 1 0 ${cx} ${cy+hr} `;
-                    p += `A ${hr} ${hr} 0 1 0 ${cx} ${cy-hr} Z `;
-
-                    p += `M ${cx + hr - 10} ${cy - 10} `; 
-                    p += `L ${baseW} ${slitY} L ${baseW} ${slitY + 15} L ${cx + hr - 10} ${cy + 5} Z `; 
-                    
-                    const bleedPath = new fabric.Path(p, { fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], originX: 'center', originY: 'center', fillRule: 'evenodd' });
-                    const trimPath = new fabric.Path(p, { fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 6], originX: 'center', originY: 'center', fillRule: 'evenodd' });
-                    const safePath = new fabric.Path(p, { fill: 'transparent', stroke: '#00FF00', strokeWidth: 1.5, strokeDashArray: [5, 5], originX: 'center', originY: 'center', fillRule: 'evenodd' });
-
-                    trimPath.scaleX = 0.98; trimPath.scaleY = 0.98;
-                    safePath.scaleX = 0.95; safePath.scaleY = 0.95;
-
-                    const guideGroup = new fabric.Group([bleedPath, trimPath, safePath], {
-                        originX: 'center',
-                        originY: 'center',
-                        left: canvas.width / 2,
-                        top: canvas.height / 2,
-                        selectable: false,
-                        evented: false
-                    });
-
+                    const canvasW = canvas.width;
+                    const canvasH = canvas.height;
                     const padding = 20;
-                    const scaleFactor = Math.min((canvas.width - padding*2) / guideGroup.width, (canvas.height - padding*2) / guideGroup.height);
                     
-                    guideGroup.scaleX = scaleFactor;
-                    guideGroup.scaleY = scaleFactor;
-                    canvas.add(guideGroup);
+                    const availableW = canvasW - padding * 2;
+                    const availableH = canvasH - padding * 2;
+                    
+                    const aspect = 4.25 / 11;
+                    let targetW = availableW;
+                    let targetH = targetW / aspect;
+                    if (targetH > availableH) {
+                        targetH = availableH;
+                        targetW = targetH * aspect;
+                    }
+                    
+                    const offsetX = (canvasW - targetW) / 2;
+                    const offsetY = (canvasH - targetH) / 2;
+                    
+                    const bleedPx = currentProduct.bleed * DISPLAY_DPI; 
+                    const safePx = 0.125 * DISPLAY_DPI; 
+                    
+                    const scaleFactor = targetW / (4.25 * DISPLAY_DPI);
+                    const scaledBleed = bleedPx * scaleFactor;
+                    const scaledSafe = safePx * scaleFactor;
+                    
+                    function createPathStr(inset) {
+                        const w = targetW - inset * 2;
+                        const h = targetH - inset * 2;
+                        const x0 = offsetX + inset;
+                        const y0 = offsetY + inset;
+                        
+                        const cr = Math.max(5, 25 * scaleFactor - inset); 
+                        const cx = offsetX + targetW / 2;
+                        const cy = offsetY + 200 * scaleFactor;
+                        const hr = 125 * scaleFactor + inset; 
+                        
+                        const slitY = cy - 20 * scaleFactor - inset;
+                        const slitW = 15 * scaleFactor + inset * 2;
+                        
+                        let p = `M ${x0+cr} ${y0} `; 
+                        p += `L ${x0+w-cr} ${y0} A ${cr} ${cr} 0 0 1 ${x0+w} ${y0+cr} `; 
+                        p += `L ${x0+w} ${y0+h-cr} A ${cr} ${cr} 0 0 1 ${x0+w-cr} ${y0+h} `; 
+                        p += `L ${x0+cr} ${y0+h} A ${cr} ${cr} 0 0 1 ${x0} ${y0+h-cr} `; 
+                        p += `L ${x0} ${y0+cr} A ${cr} ${cr} 0 0 1 ${x0+cr} ${y0} Z `; 
 
-                    const doorHangerShape = new fabric.Path(p, {
+                        p += `M ${cx} ${cy-hr} `;
+                        p += `A ${hr} ${hr} 0 1 0 ${cx} ${cy+hr} `;
+                        p += `A ${hr} ${hr} 0 1 0 ${cx} ${cy-hr} Z `;
+
+                        p += `M ${cx + hr - 10 * scaleFactor} ${slitY} `; 
+                        p += `L ${x0+w} ${slitY} L ${x0+w} ${slitY + slitW} L ${cx + hr - 10 * scaleFactor} ${slitY + slitW} Z `; 
+                        
+                        return p;
+                    }
+                    
+                    const bleedPathStr = createPathStr(0);
+                    const trimPathStr = createPathStr(scaledBleed);
+                    const safePathStr = createPathStr(scaledBleed + scaledSafe);
+
+                    const bleedPath = new fabric.Path(bleedPathStr, { fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], absolutePositioned: true, fillRule: 'evenodd', selectable: false, evented: false });
+                    const trimPath = new fabric.Path(trimPathStr, { fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 6], absolutePositioned: true, fillRule: 'evenodd', selectable: false, evented: false });
+                    const safePath = new fabric.Path(safePathStr, { fill: 'transparent', stroke: '#00FF00', strokeWidth: 1.5, strokeDashArray: [5, 5], absolutePositioned: true, fillRule: 'evenodd', selectable: false, evented: false });
+
+                    canvas.add(bleedPath, trimPath, safePath);
+                    
+                    const doorHangerShape = new fabric.Path(bleedPathStr, {
                         absolutePositioned: true,
-                        fill: 'transparent',
-                        stroke: 'transparent',
-                        fillRule: 'evenodd',
-                        originX: 'center',
-                        originY: 'center',
-                        left: canvas.width / 2,
-                        top: canvas.height / 2,
-                        scaleX: scaleFactor,
-                        scaleY: scaleFactor
+                        fillRule: 'evenodd'
                     });
                     
                     canvas.clipPath = doorHangerShape;
-                    frame.style.padding = "10px 10px"; 
+                    frame.style.padding = "0px"; 
+                    });
                 }
             },
             "hat_cap": {
