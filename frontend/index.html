@@ -791,30 +791,48 @@
             currentSurface = targetSurface; loadSurfaceElements(targetSurface);
         }
 
+        function finalizeUpload(oImg) {
+            oImg.scaleToWidth(canvas.width * 0.4);
+            oImg.set({
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                originX: 'center',
+                originY: 'center',
+                selectable: true,
+                hasControls: true,
+                hasBorders: true,
+                cornerColor: '#00FF00',
+                borderColor: '#00FF00',
+                cornerSize: 8,
+                transparentCorners: false,
+                customType: 'image'
+            });
+            canvas.add(oImg);
+            canvas.setActiveObject(oImg);
+            canvas.bringToFront(oImg);
+            canvas.renderAll();
+        }
+
         function uploadAndInsertImage() {
             const filePicker = document.getElementById('asset-file-picker'); 
             if (filePicker.files.length === 0) return alert('Please pick an image file first.');
             
             const file = filePicker.files[0];
             const reader = new FileReader();
-            reader.onload = function(e) {
-                fabric.Image.fromURL(e.target.result, function(oImg) {
-                    oImg.scaleToWidth(canvas.width * 0.5); // Auto-scale to a manageable 50% of workspace width
-                    oImg.set({
-                        left: canvas.width / 2,
-                        top: canvas.height / 2,
-                        originX: 'center',
-                        originY: 'center',
-                        cornerColor: '#00FF00', // Matches our Print-Matrix Shield theme
-                        borderColor: '#00FF00',
-                        cornerSize: 8,
-                        transparentCorners: false,
-                        customType: 'image'
-                    });
-                    canvas.add(oImg);
-                    canvas.setActiveObject(oImg);
-                    canvas.renderAll();
-                });
+            reader.onload = function(fEvent) {
+                const imgObj = new Image();
+                imgObj.src = fEvent.target.result;
+                imgObj.onload = function() {
+                    let fabricImage;
+                    if (typeof fabric.Image.fromObject === 'function' || !fabric.Image.fromURL) {
+                        fabricImage = new fabric.Image(imgObj);
+                        finalizeUpload(fabricImage);
+                    } else {
+                        fabric.Image.fromURL(fEvent.target.result, function(oImg) {
+                            finalizeUpload(oImg);
+                        });
+                    }
+                };
             };
             reader.readAsDataURL(file);
         }
