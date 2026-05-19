@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alkatra&family=Allura&family=Amatic+SC&family=Anonymous+Pro&family=Antic+Didone&family=Anton&family=Architects+Daughter&family=Archivo+Black&family=Bangers&family=Barlow+Condensed&family=Bebas+Neue&family=Bungee&family=Caveat&family=Cinzel:wght@700&family=Comfortaa&family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Creepster&family=Dancing+Script&family=DM+Sans&family=Fascinate&family=Fjalla+One&family=Fredoka&family=Great+Vibes&family=IBM+Plex+Mono&family=Inconsolata&family=Inter:wght@400;700&family=Jost&family=Josefin+Sans&family=Karla&family=Lato&family=Lobster&family=Lora&family=Macondo&family=Merriweather&family=Monoton&family=Montserrat:wght@400;700&family=Nunito&family=Open+Sans&family=Oswald:wght@400;700&family=Pacifico&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,700&family=Poppins&family=Permanent+Marker&family=Quicksand&family=Raleway&family=Righteous&family=Roboto&family=Russo+One&family=Sacramento&family=Satisfy&family=Shadows+Into+Light&family=Special+Elite&family=Syne:wght@700&family=Unbounded&family=Work+Sans&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #1e1e24; color: #f4f4f9; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
@@ -62,6 +63,9 @@
         .proof-img-frame { background: white; padding: 10px; border-radius: 4px; margin: 15px 0; border: 2px dashed #ccc; }
         .proof-img-frame img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
         
+        .gallery-card { transition: transform 0.2s, border-color 0.2s; }
+        .gallery-card:hover { border-color: #00a2ff !important; transform: translateY(-3px); }
+        
         .form-block { display: flex; flex-direction: column; text-align: left; gap: 12px; margin-bottom: 20px; background: #1a1a22; padding: 15px; border-radius: 6px; border: 1px solid #3e3e4a; }
         .form-field { display: flex; flex-direction: column; gap: 5px; }
         .form-field label { font-size: 12px; font-weight: bold; color: #a0a0ab; text-transform: uppercase; }
@@ -105,13 +109,33 @@
 
     
 
-    <div class="info-bar-container">
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <select id="product-selector" onchange="changeProduct(this.value)" style="background: #2a2a35; border: 1px solid #00a2ff; padding: 10px; color: white; border-radius: 6px; font-weight: bold; font-size: 16px;">
+    <div class="info-bar-container" style="flex-direction: column; align-items: stretch; gap: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <select id="product-selector" onchange="changeProduct(this.value)" style="background: #2a2a35; border: 1px solid #00a2ff; padding: 10px; color: white; border-radius: 6px; font-weight: bold; font-size: 16px; width: 300px;">
             </select>
-            <h2 class="user-guide-banner">🎨 Design your Custom Business Card below:</h2>
+            <div class="alert-badge">🔴 Dashed lines mark interior trimmed layout safety limits</div>
         </div>
-        <div class="alert-badge">🔴 Dashed lines mark interior trimmed layout safety limits</div>
+        
+        <div class="product-gallery" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
+            <div class="gallery-card" onclick="changeProduct('business_card')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
+                <img src="assets/mockups/mockup_businesscard_1779214596692.png" style="width: 100%; height: 90px; object-fit: cover;">
+                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Business Card</div>
+            </div>
+            <div class="gallery-card" onclick="changeProduct('t_shirt')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
+                <img src="assets/mockups/mockup_tshirt_1779214569967.png" style="width: 100%; height: 90px; object-fit: cover;">
+                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-Shirt</div>
+            </div>
+            <div class="gallery-card" onclick="changeProduct('mug_ceramic')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
+                <img src="assets/mockups/mockup_mug_1779214583499.png" style="width: 100%; height: 90px; object-fit: cover;">
+                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Ceramic Mug</div>
+            </div>
+            <div class="gallery-card" onclick="changeProduct('poster')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
+                <img src="assets/mockups/mockup_poster_1779214608945.png" style="width: 100%; height: 90px; object-fit: cover;">
+                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Poster</div>
+            </div>
+        </div>
+
+        <h2 class="user-guide-banner">🎨 Design your Custom Business Card below:</h2>
     </div>
 
     <div class="surface-selector">
@@ -185,7 +209,7 @@
                 <h2 style="color: #28a745; margin: 0; font-size: 20px;">🔍 Production Review Ticket</h2>
                 <span id="display-order-badge" style="background: #28a745; color: white; padding: 3px 8px; font-size: 12px; font-weight: bold; border-radius: 4px;">#ORD-0000</span>
             </div>
-            <div class="proof-img-frame"><img id="modal-proof-image" src="" alt="Production Proof"></div>
+            <div class="proof-img-frame"><div id="product-3d-viewport" style="width: 100%; height: 320px; background: #1a1a22; border-radius: 6px; overflow: hidden; position: relative;"></div></div>
             <div class="form-block">
                 <div style="display: flex; gap: 15px; width: 100%;">
                     <div class="form-field" style="width: 35%;">
@@ -313,6 +337,27 @@
             
             canvas.setWidth(totalWidthPx);
             canvas.setHeight(totalHeightPx);
+            canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+            
+            document.getElementById('product-selector').value = key;
+            
+            const frame = document.querySelector('.canvas-frame');
+            frame.style.backgroundPosition = "center";
+            frame.style.backgroundRepeat = "no-repeat";
+            
+            if (currentProduct.category === "APPAREL & WEARABLES") {
+                frame.style.backgroundImage = "url('assets/mockups/mockup_tshirt_1779214569967.png')";
+                frame.style.backgroundSize = "contain";
+            } else if (currentProduct.category === "DRINKWARE") {
+                frame.style.backgroundImage = "url('assets/mockups/mockup_mug_1779214583499.png')";
+                frame.style.backgroundSize = "contain";
+            } else if (currentProduct.name.includes("Poster") || currentProduct.name.includes("Banner")) {
+                frame.style.backgroundImage = "url('assets/mockups/mockup_poster_1779214608945.png')";
+                frame.style.backgroundSize = "contain";
+            } else {
+                frame.style.backgroundImage = "url('assets/mockups/mockup_businesscard_1779214596692.png')";
+                frame.style.backgroundSize = "cover";
+            }
             
             const envelope = document.getElementById('blueprint-ruler-envelope');
             envelope.style.gridTemplateColumns = `100px ${totalWidthPx}px`;
@@ -465,9 +510,105 @@
             const designId = "frontend_card_test_001";
             const blueprintPayload = { design_id: designId, product_id: activeProductKey, status: "designing", dimensions: { width_in: currentProduct.width, height_in: currentProduct.height, bleed_in: BLEED_IN }, surfaces: [{ surface_name: "front", elements: generateSurfacePayload('front') }, { surface_name: "back", elements: generateSurfacePayload('back') }] };
             fetch('https://vista-dub.onrender.com/api/v1/designs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(blueprintPayload) }).then(res => res.json()).then(data => {
-                const proofUrl = `/api/v1/designs/${designId}/render/front?dpi=150&t=${new Date().getTime()}`;
-                document.getElementById('modal-proof-image').src = proofUrl; document.getElementById('approval-modal').style.display = 'flex';
+                if (data.proof_base64) {
+                    initialize3DPreviewScene(data.proof_base64);
+                }
+                document.getElementById('approval-modal').style.display = 'flex';
             }).catch(err => alert('Blueprint sync failed.'));
+        }
+
+        let current3DAnimationId = null;
+        function initialize3DPreviewScene(base64TextureUrl) {
+            const container = document.getElementById('product-3d-viewport');
+            container.innerHTML = '';
+            if (current3DAnimationId) {
+                cancelAnimationFrame(current3DAnimationId);
+            }
+
+            const width = container.clientWidth || 500;
+            const height = container.clientHeight || 320;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            
+            const maxDim = Math.max(currentProduct.width, currentProduct.height);
+            camera.position.z = maxDim * 1.5;
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            container.appendChild(renderer.domElement);
+
+            const loader = new THREE.TextureLoader();
+            const productTexture = loader.load(base64TextureUrl);
+
+            let geometry;
+            let mesh;
+            const faceMaterial = new THREE.MeshStandardMaterial({ map: productTexture, roughness: 0.4, metalness: 0.1 });
+            const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            
+            if (currentProduct.category === "DRINKWARE") {
+                const radius = currentProduct.width / (2 * Math.PI); 
+                geometry = new THREE.CylinderGeometry(radius, radius, currentProduct.height, 32);
+                mesh = new THREE.Mesh(geometry, faceMaterial);
+            } else if (currentProduct.category === "APPAREL & WEARABLES") {
+                geometry = new THREE.PlaneGeometry(currentProduct.width, currentProduct.height);
+                faceMaterial.side = THREE.DoubleSide;
+                mesh = new THREE.Mesh(geometry, faceMaterial);
+            } else {
+                geometry = new THREE.BoxGeometry(currentProduct.width, currentProduct.height, 0.015);
+                const materials = [edgeMaterial, edgeMaterial, edgeMaterial, edgeMaterial, faceMaterial, faceMaterial];
+                mesh = new THREE.Mesh(geometry, materials);
+            }
+
+            scene.add(mesh);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+
+            container.addEventListener('mousedown', (e) => {
+                isDragging = true;
+            });
+            container.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaMove = {
+                        x: e.offsetX - previousMousePosition.x,
+                        y: e.offsetY - previousMousePosition.y
+                    };
+                    mesh.rotation.y += deltaMove.x * 0.01;
+                    mesh.rotation.x += deltaMove.y * 0.01;
+                }
+                previousMousePosition = { x: e.offsetX, y: e.offsetY };
+            });
+            container.addEventListener('mouseup', () => { isDragging = false; });
+            container.addEventListener('mouseleave', () => { isDragging = false; });
+
+            const animate = function () {
+                current3DAnimationId = requestAnimationFrame(animate);
+                if (!isDragging) {
+                    mesh.rotation.y += 0.005;
+                }
+                renderer.render(scene, camera);
+            };
+            animate();
+
+            const resizeObserver = new ResizeObserver(() => {
+                if (!container) return;
+                const newWidth = container.clientWidth;
+                const newHeight = container.clientHeight;
+                if (newWidth > 0 && newHeight > 0) {
+                    renderer.setSize(newWidth, newHeight);
+                    camera.aspect = newWidth / newHeight;
+                    camera.updateProjectionMatrix();
+                }
+            });
+            resizeObserver.observe(container);
         }
 
         function closeApprovalModal() { document.getElementById('approval-modal').style.display = 'none'; }
