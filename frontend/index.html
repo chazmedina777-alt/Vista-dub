@@ -311,10 +311,10 @@
                     
                     let chestLeft, chestTop, chestWidth, chestHeight;
                     if (surface === 'back') {
-                        chestWidth = canvas.width * 0.40;
-                        chestHeight = canvas.height * 0.50;
-                        chestTop = canvas.height * 0.20;
-                        chestLeft = (canvas.width - chestWidth) / 2;
+                        chestWidth = canvas.width * 0.35;
+                        chestHeight = canvas.height * 0.45;
+                        chestTop = canvas.height * 0.30;
+                        chestLeft = canvas.width * 0.32;
                     } else {
                         chestWidth = canvas.width * 0.36;
                         chestHeight = canvas.height * 0.48;
@@ -738,10 +738,10 @@
             
             // --- T-SHIRT: Localized chest-area bounding box ---
             if (activeProductKey === 't_shirt') {
-                const chestWidth = canvas.width * 0.35;
-                const chestHeight = canvas.height * 0.45;
-                const chestLeft = canvas.width * 0.32;
-                const chestTop = canvas.height * 0.28;
+                const chestWidth = canvas.__tshirtChest ? canvas.__tshirtChest.width : canvas.width * 0.36;
+                const chestHeight = canvas.__tshirtChest ? canvas.__tshirtChest.height : canvas.height * 0.48;
+                const chestLeft = canvas.__tshirtChest ? canvas.__tshirtChest.left : canvas.width * 0.32;
+                const chestTop = canvas.__tshirtChest ? canvas.__tshirtChest.top : canvas.height * 0.25;
                 
                 const bleedInset = 4;
                 const safeInset = 12;
