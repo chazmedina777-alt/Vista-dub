@@ -301,18 +301,26 @@
 
         const PRODUCT_ENGINES = {
             "t_shirt": {
-                resolveBackground: (id) => `assets/mockups/mockup_t_shirt.png`,
+                resolveBackground: (id, surface) => surface === 'back' ? `assets/mockups/mockup_t_shirt_back.png` : `assets/mockups/mockup_t_shirt.png`,
                 fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
                 bgSize: "contain",
                 geometry: "plane",
-                canvasSetup: (canvas, frame) => { 
+                canvasSetup: (canvas, frame, surface) => { 
                     canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
                     frame.style.padding = "0px";
                     
-                    const chestLeft = canvas.width * 0.32;
-                    const chestTop = canvas.height * 0.25;
-                    const chestWidth = canvas.width * 0.36;
-                    const chestHeight = canvas.height * 0.48;
+                    let chestLeft, chestTop, chestWidth, chestHeight;
+                    if (surface === 'back') {
+                        chestWidth = canvas.width * 0.40;
+                        chestHeight = canvas.height * 0.50;
+                        chestTop = canvas.height * 0.20;
+                        chestLeft = (canvas.width - chestWidth) / 2;
+                    } else {
+                        chestWidth = canvas.width * 0.36;
+                        chestHeight = canvas.height * 0.48;
+                        chestTop = canvas.height * 0.25;
+                        chestLeft = canvas.width * 0.32;
+                    }
                     
                     const chestClip = new fabric.Rect({
                         left: chestLeft,
@@ -651,7 +659,7 @@
             
             const engineConfig = getEngineConfig(key, currentProduct);
             
-            const resolveUrl = engineConfig.resolveBackground(key);
+            const resolveUrl = engineConfig.resolveBackground(key, 'front');
             if (resolveUrl) {
                 const img = new Image();
                 img.onload = () => { frame.style.backgroundImage = `url('${resolveUrl}')`; };
@@ -778,8 +786,21 @@
             canvas.clipPath = null;
             
             const engineConfig = getEngineConfig(activeProductKey, currentProduct);
+            
+            // Swap the background mockup image for surface-aware products
+            const frame = document.querySelector('.canvas-frame');
+            if (engineConfig.resolveBackground) {
+                const resolveUrl = engineConfig.resolveBackground(activeProductKey, surfaceName);
+                if (resolveUrl) {
+                    const bgImg = new Image();
+                    bgImg.onload = () => { frame.style.backgroundImage = `url('${resolveUrl}')`; };
+                    bgImg.onerror = () => { if (engineConfig.fallbackAsset) frame.style.backgroundImage = `url('${engineConfig.fallbackAsset}')`; };
+                    bgImg.src = resolveUrl;
+                }
+            }
+            
             if (engineConfig.canvasSetup) {
-                engineConfig.canvasSetup(canvas, document.querySelector('.canvas-frame'));
+                engineConfig.canvasSetup(canvas, frame, surfaceName);
             }
             
             surfacesData[surfaceName].forEach(el => {
