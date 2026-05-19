@@ -243,12 +243,12 @@
         const PRODUCT_CATALOG = {
             business_card: { name: "Business Card", category: "MARKETING & PRINT", width: 3.75, height: 2.25, bleed: 0.125, ppi: 150 },
             brochure: { name: "Brochure", category: "MARKETING & PRINT", width: 11.125, height: 8.625, bleed: 0.125, ppi: 72 },
-            flyer: { name: "Flyer", category: "MARKETING & PRINT", width: 8.5, height: 11, bleed: 0.125, ppi: 72 },
+            flyer: { name: "Flyer", category: "MARKETING & PRINT", width: 8.5, height: 11, bleed: 0.125, ppi: 72, safeMargin: 0.25 },
             postcard_4x6: { name: "Postcard (4x6)", category: "MARKETING & PRINT", width: 6.25, height: 4.25, bleed: 0.125, ppi: 150 },
             postcard_5x7: { name: "Postcard (5x7)", category: "MARKETING & PRINT", width: 7.25, height: 5.25, bleed: 0.125, ppi: 100 },
             folder: { name: "Presentation Folder", category: "MARKETING & PRINT", width: 18.25, height: 12.25, bleed: 0.125, ppi: 40 },
             rack_card: { name: "Rack Card", category: "MARKETING & PRINT", width: 4.25, height: 9.25, bleed: 0.125, ppi: 100 },
-            catalog: { name: "Catalog", category: "MARKETING & PRINT", width: 8.75, height: 11.25, bleed: 0.125, ppi: 72 },
+            catalog: { name: "Catalog", category: "MARKETING & PRINT", width: 17.5, height: 11.25, bleed: 0.125, ppi: 72 },
             door_hanger: { name: "Door Hanger", category: "MARKETING & PRINT", width: 4.75, height: 11.25, bleed: 0.125, ppi: 100 },
             menu: { name: "Menu", category: "MARKETING & PRINT", width: 8.75, height: 11.25, bleed: 0.125, ppi: 72 },
             notepad: { name: "Notepad", category: "MARKETING & PRINT", width: 5.75, height: 8.75, bleed: 0.125, ppi: 100 },
@@ -299,6 +299,36 @@
         };
 
         const PRODUCT_ENGINES = {
+            "business_card": {
+                resolveBackground: (id) => null,
+                fallbackAsset: null,
+                bgSize: "contain",
+                geometry: "box",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px"; 
+                }
+            },
+            "flyer": {
+                resolveBackground: (id) => null,
+                fallbackAsset: null,
+                bgSize: "contain",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px"; 
+                }
+            },
+            "catalog": {
+                resolveBackground: (id) => null,
+                fallbackAsset: null,
+                bgSize: "contain",
+                geometry: "angled_book",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px"; 
+                }
+            },
             "hat_cap": {
                 resolveBackground: (id) => `assets/mockups/mockup_hat_cap_1779215761158.png`,
                 fallbackAsset: "assets/mockups/mockup_hat_cap_1779215761158.png",
@@ -438,10 +468,15 @@
             
             const engineConfig = PRODUCT_ENGINES[key] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
             
-            const img = new Image();
-            img.onload = () => { frame.style.backgroundImage = `url('${engineConfig.resolveBackground(key)}')`; };
-            img.onerror = () => { frame.style.backgroundImage = `url('${engineConfig.fallbackAsset}')`; };
-            img.src = engineConfig.resolveBackground(key);
+            const resolveUrl = engineConfig.resolveBackground(key);
+            if (resolveUrl) {
+                const img = new Image();
+                img.onload = () => { frame.style.backgroundImage = `url('${resolveUrl}')`; };
+                img.onerror = () => { frame.style.backgroundImage = `url('${engineConfig.fallbackAsset}')`; };
+                img.src = resolveUrl;
+            } else {
+                frame.style.backgroundImage = 'none';
+            }
             
             frame.style.backgroundSize = engineConfig.bgSize;
             engineConfig.canvasSetup(canvas, frame);
@@ -513,7 +548,8 @@
             
             const trimRect = new fabric.Rect({ left: bleedPx, top: bleedPx, width: widthSafe, height: heightSafe, fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 4], selectable: false, evented: false });
             
-            const safeMarginIn = currentProduct.bleed > 0 ? 0.125 : 0;
+            const defaultSafe = currentProduct.bleed > 0 ? 0.125 : 0;
+            const safeMarginIn = currentProduct.safeMargin !== undefined ? currentProduct.safeMargin : defaultSafe;
             const safeMarginPx = safeMarginIn * DISPLAY_DPI;
             
             const safeRectWidth = Math.max(0, widthSafe - (2 * safeMarginPx));
@@ -521,6 +557,14 @@
             
             const safeRect = new fabric.Rect({ left: bleedPx + safeMarginPx, top: bleedPx + safeMarginPx, width: safeRectWidth, height: safeRectHeight, fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], selectable: false, evented: false });
             canvas.add(trimRect, safeRect); canvas.sendToBack(safeRect); canvas.sendToBack(trimRect);
+            
+            if (activeProductKey === 'catalog') {
+                const centerX = (currentProduct.width * DISPLAY_DPI) / 2;
+                const foldLine = new fabric.Line([centerX, 0, centerX, currentProduct.height * DISPLAY_DPI], {
+                    stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [6, 6], selectable: false, evented: false
+                });
+                canvas.add(foldLine); canvas.sendToBack(foldLine);
+            }
         }
 
         function loadSurfaceElements(surfaceName) {
@@ -650,6 +694,20 @@
                     const x = pos.getX(i);
                     const z = -Math.pow(x, 2) * 0.1; 
                     pos.setZ(i, z);
+                }
+                geometry.computeVertexNormals();
+                faceMaterial.side = THREE.DoubleSide;
+                mesh = new THREE.Mesh(geometry, faceMaterial);
+            } else if (engineConfig.geometry === "angled_book") {
+                geometry = new THREE.PlaneGeometry(currentProduct.width, currentProduct.height, 2, 1);
+                const pos = geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const x = pos.getX(i);
+                    if (Math.abs(x) > 0.1) {
+                        pos.setZ(i, 0.5); 
+                    } else {
+                        pos.setZ(i, 0);
+                    }
                 }
                 geometry.computeVertexNormals();
                 faceMaterial.side = THREE.DoubleSide;
