@@ -537,9 +537,9 @@
         function getEngineConfig(key, product) {
             if (PRODUCT_ENGINES[key]) return PRODUCT_ENGINES[key];
             
-            const paperStockIDs = ["business_card", "brochure", "flyer", "postcard_4x6", "postcard_5x7", "folder", "catalog", "menu", "notepad"];
+            const paperStockIDs = ["business_card", "brochure", "flyer", "postcard_4x6", "postcard_5x7", "folder", "catalog", "menu", "notepad", "poster"];
             
-            if (paperStockIDs.includes(key)) {
+            if (paperStockIDs.includes(key) || key.startsWith("poster")) {
                 return {
                     resolveBackground: (id) => null,
                     fallbackAsset: null,
@@ -792,17 +792,31 @@
         }
 
         function uploadAndInsertImage() {
-            const filePicker = document.getElementById('asset-file-picker'); if (filePicker.files.length === 0) return alert('Please pick an image file first.');
-            const formData = new FormData(); formData.append("file", filePicker.files[0]);
-            fetch('https://vista-dub.onrender.com/api/v1/assets/upload', { method: 'POST', body: formData }).then(res => res.json()).then(data => {
-                fabric.Image.fromURL(data.asset_url, function(img) {
-                    let startScale = 0.3; let isOversized = false;
-                    if ((img.width * startScale) > 562 || (img.height * startScale) > 337) { isOversized = true; startScale = Math.min(450 / img.width, 250 / img.height); }
-                    img.set({ left: 1.0 * DISPLAY_DPI, top: 0.5 * DISPLAY_DPI, scaleX: startScale, scaleY: startScale, hasControls: true, hasBorders: true, customType: 'image' });
-                    canvas.add(img); canvas.setActiveObject(img); canvas.renderAll();
-                    if (isOversized) { setTimeout(() => { alert("⚠️ OVERSIZE IMAGE WARNING:\n\nYour photo is larger than the physical layout frame.\n\nWe automatically scaled it down to fit on your screen, but please ensure you position it inside the red dashed lines so important details are not trimmed during the printing cut!"); }, 100); }
+            const filePicker = document.getElementById('asset-file-picker'); 
+            if (filePicker.files.length === 0) return alert('Please pick an image file first.');
+            
+            const file = filePicker.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                fabric.Image.fromURL(e.target.result, function(oImg) {
+                    oImg.scaleToWidth(canvas.width * 0.5); // Auto-scale to a manageable 50% of workspace width
+                    oImg.set({
+                        left: canvas.width / 2,
+                        top: canvas.height / 2,
+                        originX: 'center',
+                        originY: 'center',
+                        cornerColor: '#00FF00', // Matches our Print-Matrix Shield theme
+                        borderColor: '#00FF00',
+                        cornerSize: 8,
+                        transparentCorners: false,
+                        customType: 'image'
+                    });
+                    canvas.add(oImg);
+                    canvas.setActiveObject(oImg);
+                    canvas.renderAll();
                 });
-            }).catch(err => alert("Upload failed: " + err.message));
+            };
+            reader.readAsDataURL(file);
         }
 
         function generateSurfacePayload(surfaceName) {
