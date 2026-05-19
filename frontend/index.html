@@ -670,7 +670,7 @@
             }
             
             frame.style.backgroundSize = engineConfig.bgSize;
-            engineConfig.canvasSetup(canvas, frame);
+            engineConfig.canvasSetup(canvas, frame, 'front');
             
             const envelope = document.getElementById('blueprint-ruler-envelope');
             envelope.style.gridTemplateColumns = `100px ${totalWidthPx}px`;
@@ -739,9 +739,9 @@
             // --- T-SHIRT: Localized chest-area bounding box ---
             if (activeProductKey === 't_shirt') {
                 const chestWidth = canvas.__tshirtChest ? canvas.__tshirtChest.width : canvas.width * 0.36;
-                const chestHeight = canvas.__tshirtChest ? canvas.__tshirtChest.height : canvas.height * 0.48;
+                const chestHeight = canvas.__tshirtChest ? canvas.__tshirtChest.height : canvas.height * 0.42;
                 const chestLeft = canvas.__tshirtChest ? canvas.__tshirtChest.left : canvas.width * 0.32;
-                const chestTop = canvas.__tshirtChest ? canvas.__tshirtChest.top : canvas.height * 0.25;
+                const chestTop = canvas.__tshirtChest ? canvas.__tshirtChest.top : canvas.height * 0.33;
                 
                 const bleedInset = 4;
                 const safeInset = 12;
