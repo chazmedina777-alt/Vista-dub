@@ -305,7 +305,9 @@
                 bgSize: "contain",
                 geometry: "box",
                 canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    canvas.setBackgroundImage(null, () => {
+                        canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    });
                     frame.style.padding = "0px"; 
                 }
             },
@@ -315,7 +317,9 @@
                 bgSize: "contain",
                 geometry: "plane",
                 canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    canvas.setBackgroundImage(null, () => {
+                        canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    });
                     frame.style.padding = "0px"; 
                 }
             },
@@ -325,7 +329,9 @@
                 bgSize: "contain",
                 geometry: "angled_book",
                 canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    canvas.setBackgroundImage(null, () => {
+                        canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                    });
                     frame.style.padding = "0px"; 
                 }
             },
@@ -569,6 +575,12 @@
 
         function loadSurfaceElements(surfaceName) {
             canvas.clear();
+            
+            const engineConfig = PRODUCT_ENGINES[activeProductKey] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            if (engineConfig.canvasSetup) {
+                engineConfig.canvasSetup(canvas, document.querySelector('.canvas-frame'));
+            }
+            
             surfacesData[surfaceName].forEach(el => {
                 if (el.type === 'text') { canvas.add(new fabric.IText(el.text, { left: el.left + bleedPx, top: el.top + bleedPx, fontSize: el.size, fontFamily: el.font || 'Helvetica', fill: el.color })); } 
                 else if (el.type === 'image') { fabric.Image.fromURL(el.src, function(img) { img.set({ left: el.left + bleedPx, top: el.top + bleedPx, scaleX: el.scaleX || 0.2, scaleY: el.scaleY || 0.2, customType: 'image' }); canvas.add(img); }); }
