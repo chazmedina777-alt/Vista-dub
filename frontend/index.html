@@ -299,42 +299,6 @@
         };
 
         const PRODUCT_ENGINES = {
-            "business_card": {
-                resolveBackground: (id) => null,
-                fallbackAsset: null,
-                bgSize: "contain",
-                geometry: "box",
-                canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundImage(null, () => {
-                        canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
-                    });
-                    frame.style.padding = "0px"; 
-                }
-            },
-            "flyer": {
-                resolveBackground: (id) => null,
-                fallbackAsset: null,
-                bgSize: "contain",
-                geometry: "plane",
-                canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundImage(null, () => {
-                        canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
-                    });
-                    frame.style.padding = "0px"; 
-                }
-            },
-            "catalog": {
-                resolveBackground: (id) => null,
-                fallbackAsset: null,
-                bgSize: "contain",
-                geometry: "angled_book",
-                canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundImage(null, () => {
-                        canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
-                    });
-                    frame.style.padding = "0px"; 
-                }
-            },
             "hat_cap": {
                 resolveBackground: (id) => `assets/mockups/mockup_hat_cap_1779215761158.png`,
                 fallbackAsset: "assets/mockups/mockup_hat_cap_1779215761158.png",
@@ -405,27 +369,39 @@
                     frame.style.padding = "0px";
                 }
             },
-            "MARKETING & PRINT": {
-                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
-                fallbackAsset: "assets/mockups/mockup_businesscard_1779214596692.png",
-                bgSize: "cover",
-                geometry: "box",
-                canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
-                    frame.style.padding = "0px";
-                }
-            },
-            "SWAG & STATIONERY": {
-                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
-                fallbackAsset: "assets/mockups/mockup_businesscard_1779214596692.png",
-                bgSize: "contain",
-                geometry: "box",
-                canvasSetup: (canvas, frame) => { 
-                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
-                    frame.style.padding = "0px";
-                }
-            }
         };
+
+        function getEngineConfig(key, product) {
+            if (PRODUCT_ENGINES[key]) return PRODUCT_ENGINES[key];
+            
+            const paperStockIDs = ["business_card", "flyer", "catalog", "brochure", "postcard_4x6", "postcard_5x7", "folder", "rack_card", "door_hanger", "menu", "notepad", "envelope", "greeting_card", "hang_tag", "calendar"];
+            
+            if (paperStockIDs.includes(key)) {
+                return {
+                    resolveBackground: (id) => null,
+                    fallbackAsset: null,
+                    bgSize: "contain",
+                    geometry: (key === "catalog") ? "angled_book" : (key === "flyer" ? "plane" : "box"),
+                    canvasSetup: (canvas, frame) => { 
+                        canvas.setBackgroundImage(null, () => {
+                            canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+                        });
+                        frame.style.padding = "0px"; 
+                    }
+                };
+            } else {
+                return PRODUCT_ENGINES[product.category] || {
+                    resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
+                    fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                    bgSize: "contain",
+                    geometry: "box",
+                    canvasSetup: (canvas, frame) => { 
+                        canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                        frame.style.padding = "0px";
+                    }
+                };
+            }
+        }
 
         let activeProductKey = 'business_card';
         let currentProduct = PRODUCT_CATALOG[activeProductKey];
@@ -472,7 +448,7 @@
             frame.style.backgroundPosition = "center";
             frame.style.backgroundRepeat = "no-repeat";
             
-            const engineConfig = PRODUCT_ENGINES[key] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            const engineConfig = getEngineConfig(key, currentProduct);
             
             const resolveUrl = engineConfig.resolveBackground(key);
             if (resolveUrl) {
@@ -576,7 +552,7 @@
         function loadSurfaceElements(surfaceName) {
             canvas.clear();
             
-            const engineConfig = PRODUCT_ENGINES[activeProductKey] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            const engineConfig = getEngineConfig(activeProductKey, currentProduct);
             if (engineConfig.canvasSetup) {
                 engineConfig.canvasSetup(canvas, document.querySelector('.canvas-frame'));
             }
@@ -689,7 +665,7 @@
             const faceMaterial = new THREE.MeshStandardMaterial({ map: productTexture, roughness: 0.4, metalness: 0.1 });
             const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
             
-            const engineConfig = PRODUCT_ENGINES[activeProductKey] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            const engineConfig = getEngineConfig(activeProductKey, currentProduct);
 
             if (engineConfig.geometry === "cylinder") {
                 const radius = currentProduct.width / (2 * Math.PI); 
