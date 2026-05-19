@@ -380,6 +380,27 @@
                     frame.style.padding = "120px 80px 200px 80px"; 
                 }
             },
+            "door_hanger": {
+                resolveBackground: (id) => `assets/mockups/mockup_door_hanger.png`,
+                fallbackAsset: "assets/mockups/mockup_door_hanger.png",
+                bgSize: "contain",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundImage(null, () => {
+                        canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    });
+                    
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const r = w * 0.15; 
+                    const cx = w / 2;
+                    const cy = w * 0.15 + r;
+                    const pathStr = `M 0 0 L ${w} 0 L ${w} ${h} L 0 ${h} Z M ${cx} ${cy - r} L ${cx} 0 L ${cx - 5} 0 L ${cx - 5} ${cy - r} A ${r} ${r} 0 1 0 ${cx} ${cy - r}`;
+                    canvas.clipPath = new fabric.Path(pathStr, { absolutePositioned: true, fillRule: 'evenodd' });
+                    
+                    frame.style.padding = "30px 140px"; 
+                }
+            },
             "hat_cap": {
                 resolveBackground: (id) => `assets/mockups/mockup_hat_cap_1779215761158.png`,
                 fallbackAsset: "assets/mockups/mockup_hat_cap_1779215761158.png",
@@ -632,6 +653,7 @@
 
         function loadSurfaceElements(surfaceName) {
             canvas.clear();
+            canvas.clipPath = null;
             
             const engineConfig = getEngineConfig(activeProductKey, currentProduct);
             if (engineConfig.canvasSetup) {
