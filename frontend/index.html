@@ -317,7 +317,7 @@
             const emailTarget = document.getElementById('client-email').value; const chosenMaterial = document.getElementById('order-material-type').value; const chosenQuantity = document.getElementById('order-quantity-tier').value;
             const btn = document.getElementById('confirm-order-btn');
             btn.innerText = "Processing..."; btn.disabled = true;
-            fetch(`/api/v1/designs/frontend_card_test_001/submit-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target_email: emailTarget, order_number: activeOrderNumber, material_type: chosenMaterial, quantity: chosenQuantity }) })
+            fetch(`https://vista-dub.onrender.com/api/v1/designs/frontend_card_test_001/submit-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target_email: emailTarget, order_number: activeOrderNumber, material_type: chosenMaterial, quantity: chosenQuantity }) })
             .then(res => res.json())
             .then(data => {
                 alert(`✨ PRODUCTION ORDER LOGGED!\n\nJob Card #ORD-${data.order_number} successfully registered.\nRun Size: ${data.quantity} units\nMaterial Stock: ${chosenMaterial}\n\nPress-ready data stream dispatched successfully!`);
