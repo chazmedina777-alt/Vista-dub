@@ -299,33 +299,85 @@
         };
 
         const PRODUCT_ENGINES = {
+            "hat_cap": {
+                resolveBackground: (id) => `assets/mockups/mockup_hat_cap_1779215761158.png`,
+                fallbackAsset: "assets/mockups/mockup_hat_cap_1779215761158.png",
+                bgSize: "cover",
+                geometry: "curved_plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "100px 120px 40px 120px"; 
+                }
+            },
+            "hoodie": {
+                resolveBackground: (id) => `assets/mockups/mockup_hoodie_1779215778184.png`,
+                fallbackAsset: "assets/mockups/mockup_hoodie_1779215778184.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "180px 100px 120px 100px"; 
+                }
+            },
+            "pen": {
+                resolveBackground: (id) => `assets/mockups/mockup_pen_1779215810717.png`,
+                fallbackAsset: "assets/mockups/mockup_pen_1779215810717.png",
+                bgSize: "cover",
+                geometry: "box",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "180px 100px"; 
+                }
+            },
+            "usb_drive": {
+                resolveBackground: (id) => `assets/mockups/mockup_usb_drive_1779215822877.png`,
+                fallbackAsset: "assets/mockups/mockup_usb_drive_1779215822877.png",
+                bgSize: "cover",
+                geometry: "box",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "120px 140px"; 
+                }
+            },
             "DRINKWARE": {
                 resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
                 fallbackAsset: "assets/mockups/mockup_mug_1779214583499.png",
                 bgSize: "contain",
                 geometry: "cylinder",
-                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
+                }
             },
             "APPAREL & WEARABLES": {
                 resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
                 fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
                 bgSize: "contain",
                 geometry: "plane",
-                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
+                }
             },
             "SIGNAGE & LARGE FORMAT": {
                 resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
                 fallbackAsset: "assets/mockups/mockup_poster_1779214608945.png",
                 bgSize: "contain",
                 geometry: "box",
-                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
+                }
             },
             "MARKETING & PRINT": {
                 resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
                 fallbackAsset: "assets/mockups/mockup_businesscard_1779214596692.png",
                 bgSize: "cover",
                 geometry: "box",
-                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
+                }
             },
             "SWAG & STATIONERY": {
                 resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
@@ -333,8 +385,8 @@
                 bgSize: "contain",
                 geometry: "box",
                 canvasSetup: (canvas, frame) => { 
-                    // Restricted bounding coordinates for small swag items over targeted backgrounds
-                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
                 }
             }
         };
@@ -384,7 +436,7 @@
             frame.style.backgroundPosition = "center";
             frame.style.backgroundRepeat = "no-repeat";
             
-            const engineConfig = PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            const engineConfig = PRODUCT_ENGINES[key] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
             
             const img = new Image();
             img.onload = () => { frame.style.backgroundImage = `url('${engineConfig.resolveBackground(key)}')`; };
@@ -581,7 +633,7 @@
             const faceMaterial = new THREE.MeshStandardMaterial({ map: productTexture, roughness: 0.4, metalness: 0.1 });
             const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
             
-            const engineConfig = PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            const engineConfig = PRODUCT_ENGINES[activeProductKey] || PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
 
             if (engineConfig.geometry === "cylinder") {
                 const radius = currentProduct.width / (2 * Math.PI); 
@@ -589,6 +641,17 @@
                 mesh = new THREE.Mesh(geometry, faceMaterial);
             } else if (engineConfig.geometry === "plane") {
                 geometry = new THREE.PlaneGeometry(currentProduct.width, currentProduct.height);
+                faceMaterial.side = THREE.DoubleSide;
+                mesh = new THREE.Mesh(geometry, faceMaterial);
+            } else if (engineConfig.geometry === "curved_plane") {
+                geometry = new THREE.PlaneGeometry(currentProduct.width, currentProduct.height, 32, 1);
+                const pos = geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const x = pos.getX(i);
+                    const z = -Math.pow(x, 2) * 0.1; 
+                    pos.setZ(i, z);
+                }
+                geometry.computeVertexNormals();
                 faceMaterial.side = THREE.DoubleSide;
                 mesh = new THREE.Mesh(geometry, faceMaterial);
             } else {
