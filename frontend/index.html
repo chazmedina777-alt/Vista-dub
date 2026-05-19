@@ -166,7 +166,8 @@
         <div class="control-panel">
             
             <div class="tool-section">
-                <label class="tool-section-label" style="color: #28a745;">🚀 Business Card Templates:</label>
+                <label class="tool-section-label" style="color: #28a745;">🚀 Design Templates:</label>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('door_hanger_studio')">🚪 Door Hanger Studio (Front & Back)</button>
                 <button class="template-pill-btn" onclick="loadDesignTemplate('corporate_modern')">💼 Corporate Modern (Clean & Pro)</button>
                 <button class="template-pill-btn" onclick="loadDesignTemplate('luxury_editorial')">✨ Luxury Editorial (Cinzel Gold)</button>
                 <button class="template-pill-btn" onclick="loadDesignTemplate('retro_creative')">⚡ Retro Creative (Bebas / Script)</button>
@@ -644,7 +645,37 @@
             drawPrintGuidelines(); canvas.renderAll(); 
         }
 
+        const LOCAL_TEMPLATES = {
+            "door_hanger_studio": {
+                front: [
+                    { type: "text", text: "VISTA DUB", left: 130, top: 400, color: "#1c5e31", size: 40, font: "Bebas Neue" },
+                    { type: "text", text: "PRINT-MATRIX STUDIO", left: 155, top: 440, color: "#1c5e31", size: 16, font: "Helvetica" },
+                    { type: "image", src: "https://via.placeholder.com/300x300.png?text=IMAGE+UPLOAD+ZONE", left: 87.5, top: 550, scaleX: 1, scaleY: 1 },
+                    { type: "image", src: "https://via.placeholder.com/475x125/1c5e31/ffffff.png?text=", left: 0, top: 950, scaleX: 1, scaleY: 1 },
+                    { type: "text", text: "CALL FOR APPOINTMENT", left: 130, top: 970, color: "#d9bc66", size: 24, font: "Bebas Neue" },
+                    { type: "text", text: "CONTACT DETAILS (000) 000-0000", left: 75, top: 1010, color: "#ffffff", size: 22, font: "Bebas Neue" }
+                ],
+                back: [
+                    { type: "image", src: "https://via.placeholder.com/475x1125/94b4c7/94b4c7.png?text=", left: 0, top: 0, scaleX: 1, scaleY: 1 },
+                    { type: "text", text: "TEMPLATE DESCRIPTION", left: 50, top: 380, color: "#1c5e31", size: 30, font: "Bebas Neue" },
+                    { type: "text", text: "& USER INSTRUCTIONS", left: 50, top: 415, color: "#1c5e31", size: 30, font: "Bebas Neue" },
+                    { type: "text", text: "Example is vet print and rolling\nhome hoaring in placesoors,\nexperienceefficient, and\nbotographic.\n\nDecommendations give quicklink text\nbest brome place usage you putt the\neffects. Commulatous othrennost\neffects way lattoa to plosasoors, as\nusing this saton to hlk available for\npeople more.", left: 50, top: 480, color: "#333333", size: 18, font: "Helvetica" },
+                    { type: "text", text: "VISTA DUB", left: 180, top: 850, color: "#1c5e31", size: 30, font: "Bebas Neue" },
+                    { type: "text", text: "PRINT-MATRIX STUDIO", left: 175, top: 885, color: "#1c5e31", size: 12, font: "Helvetica" },
+                    { type: "image", src: "https://via.placeholder.com/475x100/1c5e31/ffffff.png?text=", left: 0, top: 975, scaleX: 1, scaleY: 1 },
+                    { type: "text", text: "VISTA DUB - 123 DESIGN AVENUE, CREATIVE CITY, ZI 54321", left: 40, top: 995, color: "#ffffff", size: 14, font: "Helvetica" },
+                    { type: "text", text: "INFO@VISTADUB.STUDIO | WWW.VISTADUB.STUDIO", left: 65, top: 1025, color: "#ffffff", size: 14, font: "Helvetica" }
+                ]
+            }
+        };
+
         function loadDesignTemplate(templateKey) {
+            if (LOCAL_TEMPLATES[templateKey]) {
+                surfacesData['front'] = LOCAL_TEMPLATES[templateKey].front || [];
+                surfacesData['back'] = LOCAL_TEMPLATES[templateKey].back || [];
+                loadSurfaceElements(currentSurface);
+                return;
+            }
             fetch('https://vista-dub.onrender.com/api/v1/templates').then(res => res.json()).then(allTemplates => {
                 const targetLayout = allTemplates[templateKey];
                 if (!targetLayout) return;
