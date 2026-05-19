@@ -298,6 +298,47 @@
             tissue_paper: { name: "Tissue Paper", category: "SWAG & STATIONERY", width: 20, height: 15, bleed: 0, ppi: 30 }
         };
 
+        const PRODUCT_ENGINES = {
+            "DRINKWARE": {
+                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
+                fallbackAsset: "assets/mockups/mockup_mug_1779214583499.png",
+                bgSize: "contain",
+                geometry: "cylinder",
+                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+            },
+            "APPAREL & WEARABLES": {
+                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
+                fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                bgSize: "contain",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+            },
+            "SIGNAGE & LARGE FORMAT": {
+                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
+                fallbackAsset: "assets/mockups/mockup_poster_1779214608945.png",
+                bgSize: "contain",
+                geometry: "box",
+                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+            },
+            "MARKETING & PRINT": {
+                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
+                fallbackAsset: "assets/mockups/mockup_businesscard_1779214596692.png",
+                bgSize: "cover",
+                geometry: "box",
+                canvasSetup: (canvas, frame) => { canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); }
+            },
+            "SWAG & STATIONERY": {
+                resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
+                fallbackAsset: "assets/mockups/mockup_businesscard_1779214596692.png",
+                bgSize: "contain",
+                geometry: "box",
+                canvasSetup: (canvas, frame) => { 
+                    // Restricted bounding coordinates for small swag items over targeted backgrounds
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas)); 
+                }
+            }
+        };
+
         let activeProductKey = 'business_card';
         let currentProduct = PRODUCT_CATALOG[activeProductKey];
         let DISPLAY_DPI = currentProduct.ppi;
@@ -337,27 +378,21 @@
             
             canvas.setWidth(totalWidthPx);
             canvas.setHeight(totalHeightPx);
-            canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
-            
             document.getElementById('product-selector').value = key;
             
             const frame = document.querySelector('.canvas-frame');
             frame.style.backgroundPosition = "center";
             frame.style.backgroundRepeat = "no-repeat";
             
-            if (currentProduct.category === "APPAREL & WEARABLES") {
-                frame.style.backgroundImage = "url('assets/mockups/mockup_tshirt_1779214569967.png')";
-                frame.style.backgroundSize = "contain";
-            } else if (currentProduct.category === "DRINKWARE") {
-                frame.style.backgroundImage = "url('assets/mockups/mockup_mug_1779214583499.png')";
-                frame.style.backgroundSize = "contain";
-            } else if (currentProduct.name.includes("Poster") || currentProduct.name.includes("Banner")) {
-                frame.style.backgroundImage = "url('assets/mockups/mockup_poster_1779214608945.png')";
-                frame.style.backgroundSize = "contain";
-            } else {
-                frame.style.backgroundImage = "url('assets/mockups/mockup_businesscard_1779214596692.png')";
-                frame.style.backgroundSize = "cover";
-            }
+            const engineConfig = PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+            
+            const img = new Image();
+            img.onload = () => { frame.style.backgroundImage = `url('${engineConfig.resolveBackground(key)}')`; };
+            img.onerror = () => { frame.style.backgroundImage = `url('${engineConfig.fallbackAsset}')`; };
+            img.src = engineConfig.resolveBackground(key);
+            
+            frame.style.backgroundSize = engineConfig.bgSize;
+            engineConfig.canvasSetup(canvas, frame);
             
             const envelope = document.getElementById('blueprint-ruler-envelope');
             envelope.style.gridTemplateColumns = `100px ${totalWidthPx}px`;
@@ -546,11 +581,13 @@
             const faceMaterial = new THREE.MeshStandardMaterial({ map: productTexture, roughness: 0.4, metalness: 0.1 });
             const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
             
-            if (currentProduct.category === "DRINKWARE") {
+            const engineConfig = PRODUCT_ENGINES[currentProduct.category] || PRODUCT_ENGINES["MARKETING & PRINT"];
+
+            if (engineConfig.geometry === "cylinder") {
                 const radius = currentProduct.width / (2 * Math.PI); 
                 geometry = new THREE.CylinderGeometry(radius, radius, currentProduct.height, 32);
                 mesh = new THREE.Mesh(geometry, faceMaterial);
-            } else if (currentProduct.category === "APPAREL & WEARABLES") {
+            } else if (engineConfig.geometry === "plane") {
                 geometry = new THREE.PlaneGeometry(currentProduct.width, currentProduct.height);
                 faceMaterial.side = THREE.DoubleSide;
                 mesh = new THREE.Mesh(geometry, faceMaterial);
