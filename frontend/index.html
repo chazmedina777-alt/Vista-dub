@@ -387,9 +387,6 @@
                 geometry: "plane",
                 canvasSetup: (canvas, frame) => { 
                     canvas.setBackgroundImage(null, () => {
-                        canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
-                    });
-                    
                     const baseW = 425;
                     const baseH = 1100;
                     const cr = 25; 
@@ -411,14 +408,33 @@
                     p += `M ${cx + hr - 10} ${cy - 10} `; 
                     p += `L ${baseW} ${slitY} L ${baseW} ${slitY + 15} L ${cx + hr - 10} ${cy + 5} Z `; 
                     
+                    const bleedPath = new fabric.Path(p, { fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], originX: 'center', originY: 'center', fillRule: 'evenodd' });
+                    const trimPath = new fabric.Path(p, { fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 6], originX: 'center', originY: 'center', fillRule: 'evenodd' });
+                    const safePath = new fabric.Path(p, { fill: 'transparent', stroke: '#00FF00', strokeWidth: 1.5, strokeDashArray: [5, 5], originX: 'center', originY: 'center', fillRule: 'evenodd' });
+
+                    trimPath.scaleX = 0.98; trimPath.scaleY = 0.98;
+                    safePath.scaleX = 0.95; safePath.scaleY = 0.95;
+
+                    const guideGroup = new fabric.Group([bleedPath, trimPath, safePath], {
+                        originX: 'center',
+                        originY: 'center',
+                        left: canvas.width / 2,
+                        top: canvas.height / 2,
+                        selectable: false,
+                        evented: false
+                    });
+
                     const padding = 20;
-                    const scaleFactor = Math.min((canvas.width - padding*2) / baseW, (canvas.height - padding*2) / baseH);
+                    const scaleFactor = Math.min((canvas.width - padding*2) / guideGroup.width, (canvas.height - padding*2) / guideGroup.height);
+                    
+                    guideGroup.scaleX = scaleFactor;
+                    guideGroup.scaleY = scaleFactor;
+                    canvas.add(guideGroup);
 
                     const doorHangerShape = new fabric.Path(p, {
                         absolutePositioned: true,
                         fill: 'transparent',
-                        stroke: '#00FF00',
-                        strokeDashArray: [5, 5],
+                        stroke: 'transparent',
                         fillRule: 'evenodd',
                         originX: 'center',
                         originY: 'center',
@@ -429,25 +445,6 @@
                     });
                     
                     canvas.clipPath = doorHangerShape;
-                    
-                    const visualOverlay = new fabric.Path(p, {
-                        absolutePositioned: true,
-                        fill: 'transparent',
-                        stroke: '#00FF00',
-                        strokeWidth: 2 / scaleFactor, // normalize stroke thickness
-                        strokeDashArray: [5, 5],
-                        fillRule: 'evenodd',
-                        selectable: false,
-                        evented: false,
-                        originX: 'center',
-                        originY: 'center',
-                        left: canvas.width / 2,
-                        top: canvas.height / 2,
-                        scaleX: scaleFactor,
-                        scaleY: scaleFactor
-                    });
-                    canvas.add(visualOverlay);
-                    
                     frame.style.padding = "10px 10px"; 
                 }
             },
@@ -677,6 +674,7 @@
         function generateRandomOrderNumber() { return Math.floor(1000 + Math.random() * 9000).toString(); }
 
         function drawPrintGuidelines() {
+            if (activeProductKey === 'door_hanger') return;
             const widthSafe = Math.max(0, (currentProduct.width - (2 * BLEED_IN)) * DISPLAY_DPI);
             const heightSafe = Math.max(0, (currentProduct.height - (2 * BLEED_IN)) * DISPLAY_DPI);
             
