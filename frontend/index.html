@@ -300,6 +300,16 @@
         };
 
         const PRODUCT_ENGINES = {
+            "t_shirt": {
+                resolveBackground: (id) => `assets/mockups/mockup_t_shirt.png`,
+                fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                bgSize: "contain",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
+                }
+            },
             "polo_shirt": {
                 resolveBackground: (id) => `assets/mockups/mockup_polo_shirt.png`,
                 fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
@@ -689,6 +699,26 @@
 
         function drawPrintGuidelines() {
             if (activeProductKey === 'door_hanger') return;
+            
+            // --- T-SHIRT: Localized chest-area bounding box ---
+            if (activeProductKey === 't_shirt') {
+                const chestWidth = canvas.width * 0.35;
+                const chestHeight = canvas.height * 0.45;
+                const chestLeft = canvas.width * 0.32;
+                const chestTop = canvas.height * 0.28;
+                
+                const bleedInset = 4;
+                const safeInset = 12;
+                
+                const bleedRect = new fabric.Rect({ left: chestLeft - bleedInset, top: chestTop - bleedInset, width: chestWidth + bleedInset * 2, height: chestHeight + bleedInset * 2, fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], selectable: false, evented: false });
+                const trimRect = new fabric.Rect({ left: chestLeft, top: chestTop, width: chestWidth, height: chestHeight, fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 4], selectable: false, evented: false });
+                const safeRect = new fabric.Rect({ left: chestLeft + safeInset, top: chestTop + safeInset, width: chestWidth - safeInset * 2, height: chestHeight - safeInset * 2, fill: 'transparent', stroke: '#00FF00', strokeWidth: 1.5, strokeDashArray: [5, 5], selectable: false, evented: false });
+                
+                canvas.add(bleedRect, trimRect, safeRect);
+                canvas.sendToBack(safeRect); canvas.sendToBack(trimRect); canvas.sendToBack(bleedRect);
+                return;
+            }
+            
             const widthSafe = Math.max(0, (currentProduct.width - (2 * BLEED_IN)) * DISPLAY_DPI);
             const heightSafe = Math.max(0, (currentProduct.height - (2 * BLEED_IN)) * DISPLAY_DPI);
             
