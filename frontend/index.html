@@ -24,8 +24,8 @@
         
         .workspace-container { display: flex; gap: 30px; align-items: flex-start; width: 100%; max-width: 1060px; justify-content: center; }
         
-        .blueprint-outer-wrapper { position: relative; width: 100%; max-width: 674px; display: flex; justify-content: center; }
-        .blueprint-ruler-envelope { display: grid; grid-template-columns: 100px 562px; grid-template-rows: 337px 35px; row-gap: 12px; column-gap: 12px; transform-origin: top center; }
+        .blueprint-outer-wrapper { position: relative; width: 100%; display: flex; justify-content: center; align-items: flex-start; }
+        .blueprint-ruler-envelope { display: grid; grid-template-columns: 100px 562px; grid-template-rows: 337px 35px; row-gap: 12px; column-gap: 12px; transform-origin: top left; }
         
         .ruler-vertical { grid-column: 1; grid-row: 1; border-top: 2px solid #a0a0ab; border-bottom: 2px solid #a0a0ab; position: relative; width: 14px; margin-left: auto; }
         .ruler-vertical::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #a0a0ab; transform: translateX(-50%); }
@@ -342,14 +342,25 @@
             const wrapper = document.getElementById('blueprint-outer-wrapper');
             const envelope = document.getElementById('blueprint-ruler-envelope');
             const totalWidthPx = currentProduct.width * DISPLAY_DPI;
-            const envelopeWidth = totalWidthPx + 100;
-            if (window.innerWidth < envelopeWidth + 40) {
-                const scaleFactor = (window.innerWidth - 40) / envelopeWidth;
+            const envelopeWidth = totalWidthPx + 112; // 100px col + 12px gap
+            const envelopeHeight = currentProduct.height * DISPLAY_DPI + 47; // row 1 + 12px gap + 35px row 2
+            
+            let availableWidth;
+            if (window.innerWidth <= 850) {
+                availableWidth = window.innerWidth - 40;
+            } else {
+                availableWidth = Math.min(window.innerWidth - 40, 1060) - 380; // 350 panel + 30 gap
+            }
+            
+            if (envelopeWidth > availableWidth) {
+                const scaleFactor = availableWidth / envelopeWidth;
                 envelope.style.transform = `scale(${scaleFactor})`;
-                wrapper.style.height = `${(currentProduct.height * DISPLAY_DPI + 35) * scaleFactor}px`;
+                wrapper.style.width = `${availableWidth}px`;
+                wrapper.style.height = `${envelopeHeight * scaleFactor}px`;
             } else {
                 envelope.style.transform = 'scale(1)';
-                wrapper.style.height = `${currentProduct.height * DISPLAY_DPI + 35}px`;
+                wrapper.style.width = `${envelopeWidth}px`;
+                wrapper.style.height = `${envelopeHeight}px`;
             }
         }
         window.addEventListener('resize', scaleLayoutResponsive);
