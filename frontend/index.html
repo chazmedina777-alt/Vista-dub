@@ -308,6 +308,34 @@
                 canvasSetup: (canvas, frame) => { 
                     canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
                     frame.style.padding = "0px";
+                    
+                    const chestLeft = canvas.width * 0.32;
+                    const chestTop = canvas.height * 0.25;
+                    const chestWidth = canvas.width * 0.36;
+                    const chestHeight = canvas.height * 0.48;
+                    
+                    const chestClip = new fabric.Rect({
+                        left: chestLeft,
+                        top: chestTop,
+                        width: chestWidth,
+                        height: chestHeight,
+                        absolutePositioned: true
+                    });
+                    canvas.clipPath = chestClip;
+                    
+                    canvas.__tshirtChest = { left: chestLeft, top: chestTop, width: chestWidth, height: chestHeight };
+                    
+                    canvas.on('object:moving', function(e) {
+                        if (!canvas.__tshirtChest) return;
+                        const obj = e.target;
+                        if (!obj.selectable) return;
+                        const bounds = obj.getBoundingRect();
+                        const zone = canvas.__tshirtChest;
+                        if (bounds.left < zone.left) obj.left = zone.left + (obj.left - bounds.left);
+                        if (bounds.top < zone.top) obj.top = zone.top + (obj.top - bounds.top);
+                        if (bounds.left + bounds.width > zone.left + zone.width) obj.left = zone.left + zone.width - bounds.width + (obj.left - bounds.left);
+                        if (bounds.top + bounds.height > zone.top + zone.height) obj.top = zone.top + zone.height - bounds.height + (obj.top - bounds.top);
+                    });
                 }
             },
             "polo_shirt": {
@@ -744,6 +772,8 @@
         }
 
         function loadSurfaceElements(surfaceName) {
+            canvas.off('object:moving');
+            canvas.__tshirtChest = null;
             canvas.clear();
             canvas.clipPath = null;
             
@@ -798,7 +828,16 @@
         }
 
         function deleteSelectedObject() { const obj = canvas.getActiveObject(); if (obj) { canvas.remove(obj); canvas.discardActiveObject(); canvas.renderAll(); } }
-        function addTextElement() { const newText = new fabric.IText('New Text Block', { left: (0.5 * DISPLAY_DPI) + bleedPx, top: (0.5 * DISPLAY_DPI) + bleedPx, fontSize: 24, fontFamily: 'Helvetica', fill: '#000000' }); canvas.add(newText); canvas.setActiveObject(newText); canvas.renderAll(); }
+        function addTextElement() {
+            let spawnLeft = (0.5 * DISPLAY_DPI) + bleedPx;
+            let spawnTop = (0.5 * DISPLAY_DPI) + bleedPx;
+            if (canvas.__tshirtChest) {
+                spawnLeft = canvas.__tshirtChest.left + canvas.__tshirtChest.width * 0.15;
+                spawnTop = canvas.__tshirtChest.top + canvas.__tshirtChest.height * 0.15;
+            }
+            const newText = new fabric.IText('New Text Block', { left: spawnLeft, top: spawnTop, fontSize: 24, fontFamily: 'Helvetica', fill: '#000000' });
+            canvas.add(newText); canvas.setActiveObject(newText); canvas.renderAll();
+        }
 
         canvas.on('selection:created', updateToolbarUI); canvas.on('selection:updated', updateToolbarUI);
         function updateToolbarUI(e) { const obj = e.selected[0]; if (obj && (obj.type === 'i-text' || obj.type === 'text')) { document.getElementById('color-picker').value = obj.fill; document.getElementById('font-selector').value = obj.fontFamily; } }
@@ -822,10 +861,21 @@
         }
 
         function finalizeUpload(oImg) {
-            oImg.scaleToWidth(canvas.width * 0.4);
+            let targetLeft = canvas.width / 2;
+            let targetTop = canvas.height / 2;
+            let scaleTarget = canvas.width * 0.4;
+            
+            if (canvas.__tshirtChest) {
+                const zone = canvas.__tshirtChest;
+                targetLeft = zone.left + zone.width / 2;
+                targetTop = zone.top + zone.height / 2;
+                scaleTarget = zone.width * 0.8;
+            }
+            
+            oImg.scaleToWidth(scaleTarget);
             oImg.set({
-                left: canvas.width / 2,
-                top: canvas.height / 2,
+                left: targetLeft,
+                top: targetTop,
                 originX: 'center',
                 originY: 'center',
                 selectable: true,
