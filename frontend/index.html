@@ -374,7 +374,7 @@
         function getEngineConfig(key, product) {
             if (PRODUCT_ENGINES[key]) return PRODUCT_ENGINES[key];
             
-            const paperStockIDs = ["business_card", "flyer", "catalog", "brochure", "postcard_4x6", "postcard_5x7", "folder", "rack_card", "door_hanger", "menu", "notepad", "envelope", "greeting_card", "hang_tag", "calendar"];
+            const paperStockIDs = ["business_card", "brochure", "flyer", "postcard_4x6", "postcard_5x7", "folder", "catalog", "menu", "notepad"];
             
             if (paperStockIDs.includes(key)) {
                 return {
