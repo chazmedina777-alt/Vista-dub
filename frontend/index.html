@@ -106,7 +106,11 @@
     
 
     <div class="info-bar-container">
-        <h2 class="user-guide-banner">🎨 Design your business card below:</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <select id="product-selector" onchange="changeProduct(this.value)" style="background: #2a2a35; border: 1px solid #00a2ff; padding: 10px; color: white; border-radius: 6px; font-weight: bold; font-size: 16px;">
+            </select>
+            <h2 class="user-guide-banner">🎨 Design your Custom Business Card below:</h2>
+        </div>
         <div class="alert-badge">🔴 Dashed lines mark interior trimmed layout safety limits</div>
     </div>
 
@@ -212,24 +216,146 @@
         </div>
     </div>
     <script>
+        const PRODUCT_CATALOG = {
+            business_card: { name: "Business Card", category: "MARKETING & PRINT", width: 3.75, height: 2.25, bleed: 0.125, ppi: 150 },
+            brochure: { name: "Brochure", category: "MARKETING & PRINT", width: 11.125, height: 8.625, bleed: 0.125, ppi: 72 },
+            flyer: { name: "Flyer", category: "MARKETING & PRINT", width: 8.5, height: 11, bleed: 0.125, ppi: 72 },
+            postcard_4x6: { name: "Postcard (4x6)", category: "MARKETING & PRINT", width: 6.25, height: 4.25, bleed: 0.125, ppi: 150 },
+            postcard_5x7: { name: "Postcard (5x7)", category: "MARKETING & PRINT", width: 7.25, height: 5.25, bleed: 0.125, ppi: 100 },
+            folder: { name: "Presentation Folder", category: "MARKETING & PRINT", width: 18.25, height: 12.25, bleed: 0.125, ppi: 40 },
+            rack_card: { name: "Rack Card", category: "MARKETING & PRINT", width: 4.25, height: 9.25, bleed: 0.125, ppi: 100 },
+            catalog: { name: "Catalog", category: "MARKETING & PRINT", width: 8.75, height: 11.25, bleed: 0.125, ppi: 72 },
+            door_hanger: { name: "Door Hanger", category: "MARKETING & PRINT", width: 4.75, height: 11.25, bleed: 0.125, ppi: 100 },
+            menu: { name: "Menu", category: "MARKETING & PRINT", width: 8.75, height: 11.25, bleed: 0.125, ppi: 72 },
+            notepad: { name: "Notepad", category: "MARKETING & PRINT", width: 5.75, height: 8.75, bleed: 0.125, ppi: 100 },
+            
+            t_shirt: { name: "T-Shirt", category: "APPAREL & WEARABLES", width: 12, height: 16, bleed: 0, ppi: 50 },
+            polo_shirt: { name: "Polo Shirt", category: "APPAREL & WEARABLES", width: 4, height: 4, bleed: 0, ppi: 100 },
+            hoodie: { name: "Hoodie", category: "APPAREL & WEARABLES", width: 12, height: 16, bleed: 0, ppi: 50 },
+            jacket: { name: "Jacket", category: "APPAREL & WEARABLES", width: 12, height: 16, bleed: 0, ppi: 50 },
+            hat_cap: { name: "Cap", category: "APPAREL & WEARABLES", width: 4, height: 2, bleed: 0, ppi: 100 },
+            hat_beanie: { name: "Beanie", category: "APPAREL & WEARABLES", width: 4, height: 2, bleed: 0, ppi: 100 },
+            tote_bag: { name: "Tote Bag", category: "APPAREL & WEARABLES", width: 10, height: 10, bleed: 0, ppi: 60 },
+            backpack_drawstring: { name: "Drawstring Backpack", category: "APPAREL & WEARABLES", width: 10, height: 12, bleed: 0, ppi: 60 },
+            safety_vest: { name: "Safety Vest", category: "APPAREL & WEARABLES", width: 10, height: 12, bleed: 0, ppi: 60 },
+            apron: { name: "Apron", category: "APPAREL & WEARABLES", width: 10, height: 10, bleed: 0, ppi: 60 },
+
+            mug_ceramic: { name: "Ceramic Mug", category: "DRINKWARE", width: 8.5, height: 3.0, bleed: 0, ppi: 100 },
+            tumbler_travel: { name: "Travel Tumbler", category: "DRINKWARE", width: 9.0, height: 4.0, bleed: 0, ppi: 80 },
+            water_bottle: { name: "Water Bottle", category: "DRINKWARE", width: 8.0, height: 4.0, bleed: 0, ppi: 80 },
+            glass_pint: { name: "Pint Glass", category: "DRINKWARE", width: 8.0, height: 3.5, bleed: 0, ppi: 80 },
+            coaster: { name: "Coaster", category: "DRINKWARE", width: 4.25, height: 4.25, bleed: 0.125, ppi: 100 },
+
+            lawn_sign: { name: "Lawn Sign", category: "SIGNAGE & LARGE FORMAT", width: 24, height: 18, bleed: 0.5, ppi: 25 },
+            banner_vinyl: { name: "Vinyl Banner", category: "SIGNAGE & LARGE FORMAT", width: 72, height: 24, bleed: 1.0, ppi: 10 },
+            banner_retractable: { name: "Retractable Banner", category: "SIGNAGE & LARGE FORMAT", width: 33, height: 80, bleed: 1.0, ppi: 10 },
+            sign_a_frame: { name: "A-Frame Sign", category: "SIGNAGE & LARGE FORMAT", width: 24, height: 36, bleed: 0.5, ppi: 20 },
+            decal_car: { name: "Car Decal", category: "SIGNAGE & LARGE FORMAT", width: 12, height: 12, bleed: 0.125, ppi: 50 },
+            magnet_car: { name: "Car Magnet", category: "SIGNAGE & LARGE FORMAT", width: 24, height: 12, bleed: 0.25, ppi: 30 },
+            poster: { name: "Poster", category: "SIGNAGE & LARGE FORMAT", width: 18, height: 24, bleed: 0.125, ppi: 40 },
+            foam_board: { name: "Foam Board", category: "SIGNAGE & LARGE FORMAT", width: 24, height: 36, bleed: 0.25, ppi: 20 },
+            tablecloth: { name: "Tablecloth", category: "SIGNAGE & LARGE FORMAT", width: 90, height: 132, bleed: 1.0, ppi: 5 },
+            flag_feather: { name: "Feather Flag", category: "SIGNAGE & LARGE FORMAT", width: 24, height: 100, bleed: 1.0, ppi: 5 },
+
+            pen: { name: "Pen", category: "SWAG & STATIONERY", width: 2.0, height: 0.25, bleed: 0, ppi: 200 },
+            usb_drive: { name: "USB Drive", category: "SWAG & STATIONERY", width: 1.0, height: 0.5, bleed: 0, ppi: 200 },
+            keychain: { name: "Keychain", category: "SWAG & STATIONERY", width: 2.0, height: 2.0, bleed: 0, ppi: 200 },
+            mouse_pad: { name: "Mouse Pad", category: "SWAG & STATIONERY", width: 9.25, height: 7.75, bleed: 0.125, ppi: 72 },
+            sticker: { name: "Sticker", category: "SWAG & STATIONERY", width: 3.25, height: 3.25, bleed: 0.125, ppi: 100 },
+            magnet_fridge: { name: "Fridge Magnet", category: "SWAG & STATIONERY", width: 3.25, height: 2.25, bleed: 0.125, ppi: 100 },
+            phone_case: { name: "Phone Case", category: "SWAG & STATIONERY", width: 3.0, height: 6.0, bleed: 0.125, ppi: 100 },
+            lanyard: { name: "Lanyard", category: "SWAG & STATIONERY", width: 36.0, height: 0.75, bleed: 0, ppi: 20 },
+            stress_ball: { name: "Stress Ball", category: "SWAG & STATIONERY", width: 1.5, height: 1.5, bleed: 0, ppi: 150 },
+            envelope: { name: "Envelope", category: "SWAG & STATIONERY", width: 9.5, height: 4.125, bleed: 0.125, ppi: 100 },
+            calendar: { name: "Calendar", category: "SWAG & STATIONERY", width: 11.25, height: 8.75, bleed: 0.125, ppi: 72 },
+            box_shipping: { name: "Shipping Box", category: "SWAG & STATIONERY", width: 10, height: 8, bleed: 0.125, ppi: 50 },
+            greeting_card: { name: "Greeting Card", category: "SWAG & STATIONERY", width: 10.25, height: 7.25, bleed: 0.125, ppi: 100 },
+            hang_tag: { name: "Hang Tag", category: "SWAG & STATIONERY", width: 2.25, height: 3.75, bleed: 0.125, ppi: 150 },
+            tissue_paper: { name: "Tissue Paper", category: "SWAG & STATIONERY", width: 20, height: 15, bleed: 0, ppi: 30 }
+        };
+
+        let activeProductKey = 'business_card';
+        let currentProduct = PRODUCT_CATALOG[activeProductKey];
+        let DISPLAY_DPI = currentProduct.ppi;
+        let BLEED_IN = currentProduct.bleed;
+        let bleedPx = BLEED_IN * DISPLAY_DPI;
+
+        function initCatalogDropdown() {
+            const selector = document.getElementById('product-selector');
+            const groups = {};
+            for (const [key, prod] of Object.entries(PRODUCT_CATALOG)) {
+                if (!groups[prod.category]) groups[prod.category] = [];
+                groups[prod.category].push({key, name: prod.name});
+            }
+            for (const [catName, prods] of Object.entries(groups)) {
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = catName;
+                prods.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.key;
+                    opt.innerText = p.name;
+                    optGroup.appendChild(opt);
+                });
+                selector.appendChild(optGroup);
+            }
+            selector.value = 'business_card';
+        }
+
+        function changeProduct(key) {
+            activeProductKey = key;
+            currentProduct = PRODUCT_CATALOG[key];
+            DISPLAY_DPI = currentProduct.ppi;
+            BLEED_IN = currentProduct.bleed;
+            bleedPx = BLEED_IN * DISPLAY_DPI;
+            
+            const totalWidthPx = currentProduct.width * DISPLAY_DPI;
+            const totalHeightPx = currentProduct.height * DISPLAY_DPI;
+            
+            canvas.setWidth(totalWidthPx);
+            canvas.setHeight(totalHeightPx);
+            
+            const envelope = document.getElementById('blueprint-ruler-envelope');
+            envelope.style.gridTemplateColumns = `100px ${totalWidthPx}px`;
+            envelope.style.gridTemplateRows = `${totalHeightPx}px 35px`;
+            
+            const trimWidth = Math.max(0, currentProduct.width - (BLEED_IN * 2));
+            const trimHeight = Math.max(0, currentProduct.height - (BLEED_IN * 2));
+            
+            document.querySelector('.ruler-vertical-text-stacked .dim-highlight').innerText = `${currentProduct.height}"`;
+            document.querySelector('.ruler-vertical-text-stacked .trim-note').innerText = `(${trimHeight.toFixed(2)}" after trim)`;
+            
+            document.querySelector('.ruler-horizontal-text').innerText = `↔️ Total Width: ${currentProduct.width}" (${trimWidth.toFixed(2)}" after trim)`;
+            
+            document.querySelector('.user-guide-banner').innerText = `🎨 Design your Custom ${currentProduct.name} below:`;
+            
+            surfacesData.front = [];
+            surfacesData.back = [];
+            currentSurface = 'front';
+            document.getElementById('btn-surface-front').classList.add('active');
+            document.getElementById('id-surface-back').classList.remove('active');
+            
+            loadSurfaceElements(currentSurface);
+            scaleLayoutResponsive();
+        }
+
         function scaleLayoutResponsive() {
             const wrapper = document.getElementById('blueprint-outer-wrapper');
             const envelope = document.getElementById('blueprint-ruler-envelope');
-            if (window.innerWidth < 850) {
-                const scaleFactor = (window.innerWidth - 40) / 674;
+            const totalWidthPx = currentProduct.width * DISPLAY_DPI;
+            const envelopeWidth = totalWidthPx + 100;
+            if (window.innerWidth < envelopeWidth + 40) {
+                const scaleFactor = (window.innerWidth - 40) / envelopeWidth;
                 envelope.style.transform = `scale(${scaleFactor})`;
-                wrapper.style.height = `${385 * scaleFactor}px`;
+                wrapper.style.height = `${(currentProduct.height * DISPLAY_DPI + 35) * scaleFactor}px`;
             } else {
                 envelope.style.transform = 'scale(1)';
-                wrapper.style.height = '385px';
+                wrapper.style.height = `${currentProduct.height * DISPLAY_DPI + 35}px`;
             }
         }
         window.addEventListener('resize', scaleLayoutResponsive);
+        
+        initCatalogDropdown();
         scaleLayoutResponsive();
-
-        const DISPLAY_DPI = 150;
-        const BLEED_IN = 0.125;
-        const bleedPx = BLEED_IN * DISPLAY_DPI;
         
         const canvas = new fabric.Canvas('editor-canvas');
         let currentSurface = 'front';
@@ -239,8 +365,18 @@
         function generateRandomOrderNumber() { return Math.floor(1000 + Math.random() * 9000).toString(); }
 
         function drawPrintGuidelines() {
-            const trimRect = new fabric.Rect({ left: bleedPx, top: bleedPx, width: 3.5 * DISPLAY_DPI, height: 2.0 * DISPLAY_DPI, fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 4], selectable: false, evented: false });
-            const safeRect = new fabric.Rect({ left: bleedPx + (0.125 * DISPLAY_DPI), top: bleedPx + (0.125 * DISPLAY_DPI), width: 3.25 * DISPLAY_DPI, height: 1.75 * DISPLAY_DPI, fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], selectable: false, evented: false });
+            const widthSafe = Math.max(0, (currentProduct.width - (2 * BLEED_IN)) * DISPLAY_DPI);
+            const heightSafe = Math.max(0, (currentProduct.height - (2 * BLEED_IN)) * DISPLAY_DPI);
+            
+            const trimRect = new fabric.Rect({ left: bleedPx, top: bleedPx, width: widthSafe, height: heightSafe, fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 4], selectable: false, evented: false });
+            
+            const safeMarginIn = currentProduct.bleed > 0 ? 0.125 : 0;
+            const safeMarginPx = safeMarginIn * DISPLAY_DPI;
+            
+            const safeRectWidth = Math.max(0, widthSafe - (2 * safeMarginPx));
+            const safeRectHeight = Math.max(0, heightSafe - (2 * safeMarginPx));
+            
+            const safeRect = new fabric.Rect({ left: bleedPx + safeMarginPx, top: bleedPx + safeMarginPx, width: safeRectWidth, height: safeRectHeight, fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], selectable: false, evented: false });
             canvas.add(trimRect, safeRect); canvas.sendToBack(safeRect); canvas.sendToBack(trimRect);
         }
 
@@ -316,7 +452,7 @@
             if (isOutOfBounds) { alert("🛑 PRE-FLIGHT ERROR: Design elements are crossing the red trim line!\n\nPlease resize or move your artwork so it sits cleanly inside the dashed borders. We cannot generate a proof until all elements are safe from being cut off."); return; }
             cacheCurrentSurfaceObjects(); activeOrderNumber = generateRandomOrderNumber(); document.getElementById('display-order-badge').innerText = `#ORD-${activeOrderNumber}`;
             const designId = "frontend_card_test_001";
-            const blueprintPayload = { design_id: designId, product_id: "us_standard_business_card", status: "designing", dimensions: { width_in: 3.5, height_in: 2.0, bleed_in: BLEED_IN }, surfaces: [{ surface_name: "front", elements: generateSurfacePayload('front') }, { surface_name: "back", elements: generateSurfacePayload('back') }] };
+            const blueprintPayload = { design_id: designId, product_id: activeProductKey, status: "designing", dimensions: { width_in: currentProduct.width, height_in: currentProduct.height, bleed_in: BLEED_IN }, surfaces: [{ surface_name: "front", elements: generateSurfacePayload('front') }, { surface_name: "back", elements: generateSurfacePayload('back') }] };
             fetch('https://vista-dub.onrender.com/api/v1/designs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(blueprintPayload) }).then(res => res.json()).then(data => {
                 const proofUrl = `/api/v1/designs/${designId}/render/front?dpi=150&t=${new Date().getTime()}`;
                 document.getElementById('modal-proof-image').src = proofUrl; document.getElementById('approval-modal').style.display = 'flex';
@@ -329,7 +465,7 @@
             const emailTarget = document.getElementById('client-email').value; const chosenMaterial = document.getElementById('order-material-type').value; const chosenQuantity = document.getElementById('order-quantity-tier').value;
             const btn = document.getElementById('confirm-order-btn');
             btn.innerText = "Processing..."; btn.disabled = true;
-            fetch(`https://vista-dub.onrender.com/api/v1/designs/frontend_card_test_001/submit-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target_email: emailTarget, order_number: activeOrderNumber, material_type: chosenMaterial, quantity: chosenQuantity }) })
+            fetch(`https://vista-dub.onrender.com/api/v1/designs/frontend_card_test_001/submit-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target_email: emailTarget, order_number: activeOrderNumber, material_type: chosenMaterial, quantity: chosenQuantity, product_type: activeProductKey }) })
             .then(res => res.json())
             .then(data => {
                 alert(`✨ PRODUCTION ORDER LOGGED!\n\nJob Card #ORD-${data.order_number} successfully registered.\nRun Size: ${data.quantity} units\nMaterial Stock: ${chosenMaterial}\n\nPress-ready data stream dispatched successfully!`);
