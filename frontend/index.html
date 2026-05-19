@@ -299,6 +299,76 @@
         };
 
         const PRODUCT_ENGINES = {
+            "polo_shirt": {
+                resolveBackground: (id) => `assets/mockups/mockup_polo_shirt.png`,
+                fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "140px 100px"; 
+                }
+            },
+            "jacket": {
+                resolveBackground: (id) => `assets/mockups/mockup_jacket.png`,
+                fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "160px 120px"; 
+                }
+            },
+            "hat_beanie": {
+                resolveBackground: (id) => `assets/mockups/mockup_hat_beanie.png`,
+                fallbackAsset: "assets/mockups/mockup_hat_cap_1779215761158.png",
+                bgSize: "cover",
+                geometry: "curved_plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "120px 80px 100px 80px"; 
+                }
+            },
+            "tote_bag": {
+                resolveBackground: (id) => `assets/mockups/mockup_tote_bag.png`,
+                fallbackAsset: "assets/mockups/mockup_poster_1779214608945.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "150px 100px"; 
+                }
+            },
+            "backpack_drawstring": {
+                resolveBackground: (id) => `assets/mockups/mockup_backpack_drawstring.png`,
+                fallbackAsset: "assets/mockups/mockup_poster_1779214608945.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "150px 100px"; 
+                }
+            },
+            "safety_vest": {
+                resolveBackground: (id) => `assets/mockups/mockup_safety_vest.png`,
+                fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "180px 140px"; 
+                }
+            },
+            "apron": {
+                resolveBackground: (id) => `assets/mockups/mockup_apron.png`,
+                fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
+                bgSize: "cover",
+                geometry: "plane",
+                canvasSetup: (canvas, frame) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "160px 100px 120px 100px"; 
+                }
+            },
             "card_rack": {
                 resolveBackground: (id) => `assets/mockups/mockup_card_rack.png`,
                 fallbackAsset: "assets/mockups/mockup_poster_1779214608945.png",
