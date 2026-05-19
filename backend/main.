@@ -1,0 +1,133 @@
+from fastapi import FastAPI, HTTPException, status, UploadFile, File
+from fastapi.responses import Response, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from io import BytesIO
+import os
+import shutil
+import sqlite3
+import json
+from backend.schemas import PrintBlueprint
+from backend.renderer import generate_surface_render
+
+app = FastAPI(title="PrintFlow Order Engine")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+CURRENT_FILE = os.path.abspath(__file__)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(CURRENT_FILE))
+FRONTEND_FILE = os.path.join(PROJECT_ROOT, "frontend", "index.html")
+STORAGE_DIR = os.path.join(PROJECT_ROOT, "backend", "storage")
+DB_PATH = os.path.join(STORAGE_DIR, "printflow.sqlite")
+
+os.makedirs(STORAGE_DIR, exist_ok=True)
+with sqlite3.connect(DB_PATH) as conn:
+    conn.execute("CREATE TABLE IF NOT EXISTS blueprints (design_id TEXT PRIMARY KEY, payload TEXT)")
+
+app.mount("/storage", StaticFiles(directory=STORAGE_DIR), name="storage")
+
+@app.on_event("startup")
+async def startup_event():
+    print("\n" + "="*60)
+    print("  PRINTFLOW ENGINE GATEWAY WITH ASSET UPLOADS ACTIVE")
+    print(f"  Asset Storage: {STORAGE_DIR}")
+    print(f"  SQLite Database: {DB_PATH}")
+    print("="*60 + "\n")
+
+@app.post("/api/v1/assets/upload", status_code=status.HTTP_201_CREATED)
+async def upload_asset(file: UploadFile = File(...)):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid asset type.")
+    
+    safe_filename = "".join([c for c in file.filename if c.isalnum() or c in "._-"]).strip()
+    target_path = os.path.join(STORAGE_DIR, safe_filename)
+    
+    try:
+        with open(target_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return {"asset_url": f"/storage/{safe_filename}", "filename": safe_filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File system save error: {str(e)}")
+
+@app.post("/api/v1/designs", status_code=status.HTTP_201_CREATED)
+async def save_or_update_design(payload: PrintBlueprint):
+    design_id = payload.design_id
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO blueprints (design_id, payload) VALUES (?, ?)",
+            (design_id, json.dumps(payload.model_dump()))
+        )
+    return {"message": "Blueprint verified and permanently saved to SQLite", "design_id": design_id}
+
+@app.get("/api/v1/designs/{design_id}/render/{surface_name}")
+async def render_design_surface(design_id: str, surface_name: str, dpi: int = 150):
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.execute("SELECT payload FROM blueprints WHERE design_id = ?", (design_id,))
+        row = cursor.fetchone()
+        
+    if not row:
+        raise HTTPException(status_code=404, detail="Design not found.")
+        
+    blueprint = PrintBlueprint(**json.loads(row[0]))
+    
+    try:
+        pil_image = generate_surface_render(blueprint, surface_name, target_dpi=dpi)
+        buffer = BytesIO()
+        pil_image.save(buffer, format="PNG")
+        return Response(content=buffer.getvalue(), media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Rendering error: {str(e)}")
+
+# --- NEW PROOF OF CONCEPT PDF & EMAIL ENGINE ---
+
+class PoCRequest(BaseModel):
+    target_email: str
+
+@app.post("/api/v1/designs/{design_id}/send-proof")
+async def send_proof_of_concept(design_id: str, payload: PoCRequest):
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.execute("SELECT payload FROM blueprints WHERE design_id = ?", (design_id,))
+        row = cursor.fetchone()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="You must hit 'Sync Whole Layout' first to save the design!")
+
+    blueprint = PrintBlueprint(**json.loads(row[0]))
+
+    try:
+        # 1. Render the High-Res Image
+        front_img = generate_surface_render(blueprint, "front", target_dpi=300)
+        
+        # 2. Convert RGBA to RGB for PDF standards
+        rgb_image = front_img.convert("RGB")
+        
+        # 3. Save as Commercial PDF
+        pdf_filename = f"{design_id}_production_master.pdf"
+        pdf_path = os.path.join(STORAGE_DIR, pdf_filename)
+        rgb_image.save(pdf_path, "PDF", resolution=300.0)
+
+        # 4. MOCK EMAIL DISPATCHER
+        print("\n" + "*"*60)
+        print(" 📧 NEW PROOF OF CONCEPT DISPATCHED")
+        print(f" To: {payload.target_email}")
+        print(f" Subject: New PrintFlow Order - {design_id}")
+        print(f" Attachment Generated: {pdf_path}")
+        print("*"*60 + "\n")
+
+        return {
+            "message": f"Success! Production PDF generated and simulated email sent to {payload.target_email}",
+            "pdf_url": f"/storage/{pdf_filename}"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PDF Generation failed: {str(e)}")
+
+@app.get("/")
+async def serve_frontend_index():
+    return FileResponse(FRONTEND_FILE)

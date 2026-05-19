@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vista Dub Graphic Production Suite v2</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alkatra&family=Allura&family=Amatic+SC&family=Anonymous+Pro&family=Antic+Didone&family=Anton&family=Architects+Daughter&family=Archivo+Black&family=Bangers&family=Barlow+Condensed&family=Bebas+Neue&family=Bungee&family=Caveat&family=Cinzel:wght@700&family=Comfortaa&family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Creepster&family=Dancing+Script&family=DM+Sans&family=Fascinate&family=Fjalla+One&family=Fredoka&family=Great+Vibes&family=IBM+Plex+Mono&family=Inconsolata&family=Inter:wght@400;700&family=Jost&family=Josefin+Sans&family=Karla&family=Lato&family=Lobster&family=Lora&family=Macondo&family=Merriweather&family=Monoton&family=Montserrat:wght@400;700&family=Nunito&family=Open+Sans&family=Oswald:wght@400;700&family=Pacifico&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,700&family=Poppins&family=Permanent+Marker&family=Quicksand&family=Raleway&family=Righteous&family=Roboto&family=Russo+One&family=Sacramento&family=Satisfy&family=Shadows+Into+Light&family=Special+Elite&family=Syne:wght@700&family=Unbounded&family=Work+Sans&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #1e1e24; color: #f4f4f9; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .brand-header { text-align: center; margin-bottom: 25px; background: linear-gradient(135deg, #2a2a35 0%, #1a1a22 100%); padding: 15px 50px; border-radius: 12px; border: 1px solid #3e3e4a; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: 500px; box-sizing: border-box; }
+        .brand-logo-img { max-height: 90px; width: auto; object-fit: contain; display: block; }
+        .brand-subtitle { color: #28a745; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin: 0; text-align: center;}
+
+        .info-bar-container { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1060px; padding-bottom: 8px; margin-bottom: 25px; box-sizing: border-box; }
+        .user-guide-banner { font-size: 22px; font-weight: 700; color: #00a2ff; margin: 0; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        .alert-badge { font-size: 12px; font-weight: bold; color: #ffbcbc; background: rgba(220,53,69,0.2); padding: 6px 12px; border-radius: 6px; border: 1px solid #dc3545; }
+
+        .surface-selector { display: flex; gap: 12px; margin-bottom: 25px; width: 100%; max-width: 1060px; justify-content: center; box-sizing: border-box; }
+        .surface-btn { background-color: #3e3e4a; color: #a0a0ab; border: 2px solid transparent; padding: 10px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.2s; font-size: 14px; text-transform: uppercase; }
+        .surface-btn.active { background-color: #007acc; color: white; border-color: #00a2ff; }
+        
+        .workspace-container { display: flex; gap: 30px; align-items: flex-start; width: 100%; max-width: 1060px; justify-content: center; }
+        
+        .blueprint-outer-wrapper { position: relative; width: 100%; max-width: 674px; display: flex; justify-content: center; }
+        .blueprint-ruler-envelope { display: grid; grid-template-columns: 100px 562px; grid-template-rows: 337px 35px; row-gap: 12px; column-gap: 12px; transform-origin: top center; }
+        
+        .ruler-vertical { grid-column: 1; grid-row: 1; border-top: 2px solid #a0a0ab; border-bottom: 2px solid #a0a0ab; position: relative; width: 14px; margin-left: auto; }
+        .ruler-vertical::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #a0a0ab; transform: translateX(-50%); }
+        .ruler-vertical-text-stacked { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 11px; font-weight: bold; color: #ffffff; text-align: right; white-space: nowrap; }
+        .ruler-vertical-text-stacked span.dim-highlight { color: #00a2ff; font-size: 13px; }
+        .ruler-vertical-text-stacked span.trim-note { color: #a0a0ab; font-size: 10px; font-weight: normal; }
+
+        .canvas-frame { grid-column: 2; grid-row: 1; border: 2px solid #3e3e4a; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
+
+        .ruler-horizontal { grid-column: 2; grid-row: 2; border-left: 2px solid #a0a0ab; border-right: 2px solid #a0a0ab; position: relative; height: 14px; margin-top: 5px; }
+        .ruler-horizontal::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #a0a0ab; transform: translateY(-50%); }
+        .ruler-horizontal-text { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); background: #1e1e24; padding: 0 8px; font-size: 12px; font-weight: bold; color: #ffffff; white-space: nowrap; }
+        
+        .control-panel { background-color: #2a2a35; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; gap: 15px; width: 350px; box-sizing: border-box; border: 1px solid #3e3e4a; }
+        .tool-section { background-color: #1a1a22; padding: 14px; border-radius: 6px; border: 1px solid #3a3a45; display: flex; flex-direction: column; gap: 10px; }
+        .tool-section-label { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+        .tool-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        
+        .action-btn { background-color: #007acc; color: white; border: none; padding: 12px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s; text-align: center; width: 100%; box-sizing: border-box; font-size: 13px; }
+        .action-btn:hover { background-color: #005999; }
+        .danger-btn { background-color: #dc3545; }
+        .danger-btn:hover { background-color: #c82333; }
+        .success-btn { background-color: #28a745; padding: 16px; font-size: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(40,167,69,0.3); }
+        .success-btn:hover { background-color: #218838; }
+        
+        select, input[type="text"], input[type="email"], input[type="file"] { padding: 10px; border-radius: 4px; border: 1px solid #444; background: #2a2a35; color: white; width: 100%; box-sizing: border-box; font-size: 13px; }
+        input[type="color"] { border: 1px solid #444; background: #2a2a35; cursor: pointer; }
+
+        .template-pill-btn { background-color: #2a2a35; color: #e0e0e6; border: 1px solid #444; padding: 12px 14px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 13px; width: 100%; box-sizing: border-box; transition: all 0.2s; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .template-pill-btn:hover { background-color: #007acc; color: white; border-color: #00a2ff; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: #2a2a35; padding: 30px; border-radius: 12px; width: 100%; max-width: 580px; text-align: center; border: 2px solid #28a745; box-shadow: 0 10px 40px rgba(0,0,0,0.8); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .proof-img-frame { background: white; padding: 10px; border-radius: 4px; margin: 15px 0; border: 2px dashed #ccc; }
+        .proof-img-frame img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        
+        .form-block { display: flex; flex-direction: column; text-align: left; gap: 12px; margin-bottom: 20px; background: #1a1a22; padding: 15px; border-radius: 6px; border: 1px solid #3e3e4a; }
+        .form-field { display: flex; flex-direction: column; gap: 5px; }
+        .form-field label { font-size: 12px; font-weight: bold; color: #a0a0ab; text-transform: uppercase; }
+        
+        @media (max-width: 850px) {
+            body { padding: 10px; }
+            .brand-header { padding: 15px; margin-bottom: 15px; }
+            .brand-logo-img { max-height: 60px; }
+            .info-bar-container { flex-direction: column; gap: 12px; text-align: center; }
+            .workspace-container { flex-direction: column; align-items: center; gap: 20px; }
+            .control-panel { width: 100%; max-width: 100%; }
+            .surface-selector { width: 100%; }
+            .surface-btn { flex: 1; text-align: center; padding: 12px 6px; font-size: 12px; }
+            .blueprint-ruler-envelope { transform: scale(0.56); margin-bottom: -150px; }
+            .form-block > div { flex-direction: column !important; gap: 15px; }
+            .form-field { width: 100% !important; }
+        }
+        
+        @media (max-width: 400px) {
+            .blueprint-ruler-envelope { transform: scale(0.48); margin-bottom: -180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand-header">
+        <img id="app-header-logo" src="/storage/vista_dub_logo.jpg" class="brand-logo-img" alt="Vista Dub Graphic Portal" onerror="this.onerror=null; this.src='/storage/vista_dub_logo.jpeg';">
+        <p class="brand-subtitle">👑 Interactive Pre-Press Blueprint Engine</p>
+    </div>
+
+    <div class="info-bar-container">
+        <h2 class="user-guide-banner">🎨 Design your business card below:</h2>
+        <div class="alert-badge">🔴 Dashed lines mark interior trimmed layout safety limits</div>
+    </div>
+
+    <div class="surface-selector">
+        <button id="btn-surface-front" class="surface-btn active" onclick="switchSurface('front')">FRONT SURFACE</button>
+        <button id="id-surface-back" class="surface-btn" onclick="switchSurface('back')">BACK SURFACE</button>
+    </div>
+
+    <div class="workspace-container">
+        
+        <div class="blueprint-outer-wrapper" id="blueprint-outer-wrapper">
+            <div class="blueprint-ruler-envelope" id="blueprint-ruler-envelope">
+                <div class="ruler-vertical">
+                    <div class="ruler-vertical-text-stacked">
+                        <span>↕️ Total Height:</span>
+                        <span class="dim-highlight">2.25"</span>
+                        <span class="trim-note">(2.0" after trim)</span>
+                    </div>
+                </div>
+                <div class="canvas-frame">
+                    <canvas id="editor-canvas" width="562" height="337"></canvas>
+                </div>
+                <div class="ruler-horizontal">
+                    <div class="ruler-horizontal-text">↔️ Total Width: 3.75" (3.5" after trim)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            
+            <div class="tool-section">
+                <label class="tool-section-label" style="color: #28a745;">🚀 Business Card Templates:</label>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('corporate_modern')">💼 Corporate Modern (Clean & Pro)</button>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('luxury_editorial')">✨ Luxury Editorial (Cinzel Gold)</button>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('retro_creative')">⚡ Retro Creative (Bebas / Script)</button>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('tech_startup')">🚀 Tech Startup (Cyber Code)</button>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('real_estate')">🏡 Real Estate (Gold Broker)</button>
+                <button class="template-pill-btn" onclick="loadDesignTemplate('minimal_boutique')">🌸 Minimal Boutique (Spa Script)</button>
+            </div>
+
+            <div class="tool-section">
+                <label class="tool-section-label" style="color: #00a2ff;">TEXT & LAYER TOOLS:</label>
+                <button class="action-btn" onclick="addTextElement()">+ Add New Text</button>
+                <div class="tool-row">
+                    <select id="font-selector" onchange="updateSelectedText('fontFamily', this.value)" style="flex-grow: 1;">
+                        <option value="Helvetica" selected>Helvetica</option>
+                        <option value="Montserrat">Montserrat</option>
+                        <option value="Playfair Display">Playfair Display</option>
+                        <option value="Cinzel">Cinzel</option>
+                        <option value="Bebas Neue">Bebas Neue</option>
+                        <option value="IBM Plex Mono">IBM Plex Mono</option>
+                        <option value="Sacramento">Sacramento</option>
+                    </select>
+                    <input type="color" id="color-picker" value="#000000" onchange="updateSelectedText('fill', this.value)" style="padding: 2px; height: 38px; width: 50px; border-radius: 4px;">
+                </div>
+                <button class="action-btn danger-btn" onclick="deleteSelectedObject()">🗑️ Delete Selected Item</button>
+            </div>
+            
+            <div class="tool-section">
+                <label class="tool-section-label" style="color: #a0a0ab;">UPLOAD BRAND LOGO:</label>
+                <input type="file" id="asset-file-picker" accept="image/*" style="font-size: 12px;">
+                <button class="action-btn" style="background-color: #5a6268;" onclick="uploadAndInsertImage()">Upload Photo to Canvas</button>
+            </div>
+
+            <button class="action-btn success-btn" onclick="processProofGeneration()">👉 Review & Approve Order</button>
+        </div>
+    </div>
+
+    <div id="approval-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3e3e4a; padding-bottom: 10px; margin-bottom: 15px;">
+                <h2 style="color: #28a745; margin: 0; font-size: 20px;">🔍 Production Review Ticket</h2>
+                <span id="display-order-badge" style="background: #28a745; color: white; padding: 3px 8px; font-size: 12px; font-weight: bold; border-radius: 4px;">#ORD-0000</span>
+            </div>
+            <div class="proof-img-frame"><img id="modal-proof-image" src="" alt="Production Proof"></div>
+            <div class="form-block">
+                <div style="display: flex; gap: 15px; width: 100%;">
+                    <div class="form-field" style="width: 35%;">
+                        <label>Print Quantity:</label>
+                        <select id="order-quantity-tier">
+                            <option value="250" selected>250 units</option>
+                            <option value="500">500 units</option>
+                            <option value="1000">1,000 units</option>
+                        </select>
+                    </div>
+                    <div class="form-field" style="width: 65%;">
+                        <label>Card Stock Material:</label>
+                        <select id="order-material-type">
+                            <option value="16pt Premium Matte">16pt Premium Matte</option>
+                            <option value="18pt Silk Laminate">18pt Silk Laminate</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Receipt Email:</label>
+                    <input type="email" id="client-email" value="ChazMedina777@gmail.com">
+                </div>
+            </div>
+            <div class="tool-row">
+                <button class="action-btn danger-btn" onclick="closeApprovalModal()" style="width: 48%;">❌ Back</button>
+                <button class="action-btn success-btn" id="confirm-order-btn" onclick="submitFinalApprovedOrder()" style="width: 48%; padding: 10px; font-size: 14px;">🚀 Order Prints</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function scaleLayoutResponsive() {
+            const wrapper = document.getElementById('blueprint-outer-wrapper');
+            const envelope = document.getElementById('blueprint-ruler-envelope');
+            if (window.innerWidth < 850) {
+                const scaleFactor = (window.innerWidth - 40) / 674;
+                envelope.style.transform = `scale(${scaleFactor})`;
+                wrapper.style.height = `${385 * scaleFactor}px`;
+            } else {
+                envelope.style.transform = 'scale(1)';
+                wrapper.style.height = '385px';
+            }
+        }
+        window.addEventListener('resize', scaleLayoutResponsive);
+        scaleLayoutResponsive();
+
+        const DISPLAY_DPI = 150;
+        const BLEED_IN = 0.125;
+        const bleedPx = BLEED_IN * DISPLAY_DPI;
+        
+        const canvas = new fabric.Canvas('editor-canvas');
+        let currentSurface = 'front';
+        let activeOrderNumber = ""; 
+        const surfacesData = { front: [], back: [] };
+
+        function generateRandomOrderNumber() { return Math.floor(1000 + Math.random() * 9000).toString(); }
+
+        function drawPrintGuidelines() {
+            const trimRect = new fabric.Rect({ left: bleedPx, top: bleedPx, width: 3.5 * DISPLAY_DPI, height: 2.0 * DISPLAY_DPI, fill: 'transparent', stroke: '#ff0000', strokeWidth: 1.5, strokeDashArray: [6, 4], selectable: false, evented: false });
+            const safeRect = new fabric.Rect({ left: bleedPx + (0.125 * DISPLAY_DPI), top: bleedPx + (0.125 * DISPLAY_DPI), width: 3.25 * DISPLAY_DPI, height: 1.75 * DISPLAY_DPI, fill: 'transparent', stroke: '#00a2ff', strokeWidth: 1.5, strokeDashArray: [4, 4], selectable: false, evented: false });
+            canvas.add(trimRect, safeRect); canvas.sendToBack(safeRect); canvas.sendToBack(trimRect);
+        }
+
+        function loadSurfaceElements(surfaceName) {
+            canvas.clear();
+            surfacesData[surfaceName].forEach(el => {
+                if (el.type === 'text') { canvas.add(new fabric.IText(el.text, { left: el.left + bleedPx, top: el.top + bleedPx, fontSize: el.size, fontFamily: el.font || 'Helvetica', fill: el.color })); } 
+                else if (el.type === 'image') { fabric.Image.fromURL(el.src, function(img) { img.set({ left: el.left + bleedPx, top: el.top + bleedPx, scaleX: el.scaleX || 0.2, scaleY: el.scaleY || 0.2, customType: 'image' }); canvas.add(img); }); }
+            });
+            drawPrintGuidelines(); canvas.renderAll(); 
+        }
+
+        function loadDesignTemplate(templateKey) {
+            fetch('/api/v1/templates').then(res => res.json()).then(allTemplates => {
+                const targetLayout = allTemplates[templateKey];
+                if (!targetLayout) return;
+                surfacesData[currentSurface] = targetLayout; loadSurfaceElements(currentSurface);
+            }).catch(err => alert("Template connection failure."));
+        }
+
+        function deleteSelectedObject() { const obj = canvas.getActiveObject(); if (obj) { canvas.remove(obj); canvas.discardActiveObject(); canvas.renderAll(); } }
+        function addTextElement() { const newText = new fabric.IText('New Text Block', { left: (0.5 * DISPLAY_DPI) + bleedPx, top: (0.5 * DISPLAY_DPI) + bleedPx, fontSize: 24, fontFamily: 'Helvetica', fill: '#000000' }); canvas.add(newText); canvas.setActiveObject(newText); canvas.renderAll(); }
+
+        canvas.on('selection:created', updateToolbarUI); canvas.on('selection:updated', updateToolbarUI);
+        function updateToolbarUI(e) { const obj = e.selected[0]; if (obj && (obj.type === 'i-text' || obj.type === 'text')) { document.getElementById('color-picker').value = obj.fill; document.getElementById('font-selector').value = obj.fontFamily; } }
+        function updateSelectedText(property, value) { const obj = canvas.getActiveObject(); if (obj && (obj.type === 'i-text' || obj.type === 'text')) { obj.set(property, value); canvas.renderAll(); } }
+
+        function cacheCurrentSurfaceObjects() {
+            const objects = canvas.getObjects(); const runtimeElements = [];
+            objects.forEach(obj => {
+                if (obj.selectable === false) return;
+                if (obj.type === 'i-text' || obj.type === 'text') { runtimeElements.push({ type: 'text', text: obj.text, left: obj.left - bleedPx, top: obj.top - bleedPx, color: obj.fill, size: obj.fontSize, font: obj.fontFamily }); } 
+                else if (obj.type === 'image' || obj.customType === 'image') { runtimeElements.push({ type: 'image', src: obj._element.src, left: obj.left - bleedPx, top: obj.top - bleedPx, scaleX: obj.scaleX, scaleY: obj.scaleY, width: obj.width, height: obj.height }); }
+            });
+            surfacesData[currentSurface] = runtimeElements;
+        }
+
+        function switchSurface(targetSurface) {
+            if (currentSurface === targetSurface) return;
+            canvas.discardActiveObject(); cacheCurrentSurfaceObjects();
+            document.getElementById('btn-surface-front').classList.toggle('active', targetSurface === 'front'); document.getElementById('id-surface-back').classList.toggle('active', targetSurface === 'back');
+            currentSurface = targetSurface; loadSurfaceElements(targetSurface);
+        }
+
+        function uploadAndInsertImage() {
+            const filePicker = document.getElementById('asset-file-picker'); if (filePicker.files.length === 0) return alert('Please pick an image file first.');
+            const formData = new FormData(); formData.append("file", filePicker.files[0]);
+            fetch('/api/v1/assets/upload', { method: 'POST', body: formData }).then(res => res.json()).then(data => {
+                fabric.Image.fromURL(data.asset_url, function(img) {
+                    let startScale = 0.3; let isOversized = false;
+                    if ((img.width * startScale) > 562 || (img.height * startScale) > 337) { isOversized = true; startScale = Math.min(450 / img.width, 250 / img.height); }
+                    img.set({ left: 1.0 * DISPLAY_DPI, top: 0.5 * DISPLAY_DPI, scaleX: startScale, scaleY: startScale, hasControls: true, hasBorders: true, customType: 'image' });
+                    canvas.add(img); canvas.setActiveObject(img); canvas.renderAll();
+                    if (isOversized) { setTimeout(() => { alert("⚠️ OVERSIZE IMAGE WARNING:\n\nYour photo is larger than the physical layout frame.\n\nWe automatically scaled it down to fit on your screen, but please ensure you position it inside the red dashed lines so important details are not trimmed during the printing cut!"); }, 100); }
+                });
+            }).catch(err => alert("Upload failed: " + err.message));
+        }
+
+        function generateSurfacePayload(surfaceName) {
+            return surfacesData[surfaceName].map((obj, idx) => {
+                if (obj.type === 'text') { return { element_id: `el_text_${surfaceName}_${idx}`, type: 'text', z_index: idx + 1, transform: { x_in: parseFloat((obj.left / DISPLAY_DPI).toFixed(4)), y_in: parseFloat((obj.top / DISPLAY_DPI).toFixed(4)), rotation_deg: 0.0 }, text_props: { text: obj.text, font_family: obj.font || 'Helvetica', font_size_pt: parseFloat(((obj.size * 72) / DISPLAY_DPI).toFixed(1)), color_hex: obj.color, align: 'left' }, image_props: null }; } 
+                else if (obj.type === 'image') { return { element_id: `el_img_${surfaceName}_${idx}`, type: 'image', z_index: idx + 1, transform: { x_in: parseFloat((obj.left / DISPLAY_DPI).toFixed(4)), y_in: parseFloat((obj.top / DISPLAY_DPI).toFixed(4)), rotation_deg: 0.0 }, text_props: null, image_props: { source_url: new URL(obj.src).pathname, width_in: parseFloat((obj.width / DISPLAY_DPI).toFixed(4)), height_in: parseFloat((obj.height / DISPLAY_DPI).toFixed(4)), scale_x: obj.scaleX, scale_y: obj.scaleY } }; }
+            });
+        }
+
+        function processProofGeneration() {
+            canvas.discardActiveObject(); let isOutOfBounds = false; const objects = canvas.getObjects();
+            for (let i = 0; i < objects.length; i++) {
+                const obj = objects[i]; if (obj.selectable === false) continue; 
+                const bounds = obj.getBoundingRect();
+                if (bounds.left < bleedPx || bounds.top < bleedPx || (bounds.left + bounds.width) > (canvas.width - bleedPx) || (bounds.top + bounds.height) > (canvas.height - bounds.width)) { isOutOfBounds = true; break; }
+            }
+            if (isOutOfBounds) { alert("🛑 PRE-FLIGHT ERROR: Design elements are crossing the red trim line!\n\nPlease resize or move your artwork so it sits cleanly inside the dashed borders. We cannot generate a proof until all elements are safe from being cut off."); return; }
+            cacheCurrentSurfaceObjects(); activeOrderNumber = generateRandomOrderNumber(); document.getElementById('display-order-badge').innerText = `#ORD-${activeOrderNumber}`;
+            const designId = "frontend_card_test_001";
+            const blueprintPayload = { design_id: designId, product_id: "us_standard_business_card", status: "designing", dimensions: { width_in: 3.5, height_in: 2.0, bleed_in: BLEED_IN }, surfaces: [{ surface_name: "front", elements: generateSurfacePayload('front') }, { surface_name: "back", elements: generateSurfacePayload('back') }] };
+            fetch('/api/v1/designs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(blueprintPayload) }).then(res => res.json()).then(data => {
+                const proofUrl = `/api/v1/designs/${designId}/render/front?dpi=150&t=${new Date().getTime()}`;
+                document.getElementById('modal-proof-image').src = proofUrl; document.getElementById('approval-modal').style.display = 'flex';
+            }).catch(err => alert('Blueprint sync failed.'));
+        }
+
+        function closeApprovalModal() { document.getElementById('approval-modal').style.display = 'none'; }
+
+        function submitFinalApprovedOrder() {
+            const emailTarget = document.getElementById('client-email').value; const chosenMaterial = document.getElementById('order-material-type').value; const chosenQuantity = document.getElementById('order-quantity-tier').value;
+            const btn = document.getElementById('confirm-order-btn');
+            btn.innerText = "Processing..."; btn.disabled = true;
+            fetch(`/api/v1/designs/frontend_card_test_001/submit-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target_email: emailTarget, order_number: activeOrderNumber, material_type: chosenMaterial, quantity: chosenQuantity }) })
+            .then(res => res.json())
+            .then(data => {
+                alert(`✨ PRODUCTION ORDER LOGGED!\n\nJob Card #ORD-${data.order_number} successfully registered.\nRun Size: ${data.quantity} units\nMaterial Stock: ${chosenMaterial}\n\nPress-ready data stream dispatched successfully!`);
+                closeApprovalModal(); btn.innerText = "🚀 Order Prints"; btn.disabled = false;
+            }).catch(err => { alert('Network dispatch failure.'); btn.innerText = "🚀 Order Prints"; btn.disabled = false; });
+        }
+
+        loadSurfaceElements('front');
+    </script>
+</body>
+</html>
