@@ -265,7 +265,7 @@
             safety_vest: { name: "Safety Vest", category: "APPAREL & WEARABLES", width: 10, height: 12, bleed: 0, ppi: 60 },
             apron: { name: "Apron", category: "APPAREL & WEARABLES", width: 10, height: 10, bleed: 0, ppi: 60 },
 
-            mug_ceramic: { name: "Ceramic Mug", category: "DRINKWARE", width: 8.5, height: 3.0, bleed: 0, ppi: 100 },
+            mug_ceramic: { name: "Ceramic Mug", category: "DRINKWARE", width: 10, height: 10, bleed: 0, ppi: 60 },
             tumbler_travel: { name: "Travel Tumbler", category: "DRINKWARE", width: 9.0, height: 4.0, bleed: 0, ppi: 80 },
             water_bottle: { name: "Water Bottle", category: "DRINKWARE", width: 8.0, height: 4.0, bleed: 0, ppi: 80 },
             glass_pint: { name: "Pint Glass", category: "DRINKWARE", width: 8.0, height: 3.5, bleed: 0, ppi: 80 },
@@ -584,6 +584,44 @@
                     frame.style.padding = "120px 140px"; 
                 }
             },
+            "mug_ceramic": {
+                resolveBackground: (id) => `assets/mockups/mockup_mug_1779214583499.png`,
+                fallbackAsset: "assets/mockups/mockup_mug_1779214583499.png",
+                bgSize: "contain",
+                geometry: "cylinder",
+                canvasSetup: (canvas, frame, surface) => { 
+                    canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
+                    frame.style.padding = "0px";
+                    
+                    const mugLeft = canvas.width * 0.22;
+                    const mugTop = canvas.height * 0.28;
+                    const mugWidth = canvas.width * 0.40;
+                    const mugHeight = canvas.height * 0.40;
+                    
+                    const mugClip = new fabric.Rect({
+                        left: mugLeft,
+                        top: mugTop,
+                        width: mugWidth,
+                        height: mugHeight,
+                        absolutePositioned: true
+                    });
+                    canvas.clipPath = mugClip;
+                    
+                    canvas.__tshirtChest = { left: mugLeft, top: mugTop, width: mugWidth, height: mugHeight };
+                    
+                    canvas.on('object:moving', function(e) {
+                        if (!canvas.__tshirtChest) return;
+                        const obj = e.target;
+                        if (!obj.selectable) return;
+                        const bounds = obj.getBoundingRect();
+                        const zone = canvas.__tshirtChest;
+                        if (bounds.left < zone.left) obj.left = zone.left + (obj.left - bounds.left);
+                        if (bounds.top < zone.top) obj.top = zone.top + (obj.top - bounds.top);
+                        if (bounds.left + bounds.width > zone.left + zone.width) obj.left = zone.left + zone.width - bounds.width + (obj.left - bounds.left);
+                        if (bounds.top + bounds.height > zone.top + zone.height) obj.top = zone.top + zone.height - bounds.height + (obj.top - bounds.top);
+                    });
+                }
+            },
             "DRINKWARE": {
                 resolveBackground: (id) => `assets/mockups/mockup_${id}.png`,
                 fallbackAsset: "assets/mockups/mockup_mug_1779214583499.png",
@@ -772,8 +810,8 @@
         function drawPrintGuidelines() {
             if (activeProductKey === 'door_hanger') return;
             
-            // --- APPAREL: Localized chest-area bounding box ---
-            if (activeProductKey === 't_shirt' || activeProductKey === 'hoodie') {
+            // --- APPAREL & MERCH: Localized print-area bounding box ---
+            if (activeProductKey === 't_shirt' || activeProductKey === 'hoodie' || activeProductKey === 'mug_ceramic') {
                 const chestWidth = canvas.__tshirtChest ? canvas.__tshirtChest.width : canvas.width * 0.36;
                 const chestHeight = canvas.__tshirtChest ? canvas.__tshirtChest.height : canvas.height * 0.47;
                 const chestLeft = canvas.__tshirtChest ? canvas.__tshirtChest.left : canvas.width * 0.32;
