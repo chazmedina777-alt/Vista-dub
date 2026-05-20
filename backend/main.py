@@ -40,6 +40,8 @@ with sqlite3.connect(DB_PATH) as conn:
     conn.execute("CREATE TABLE IF NOT EXISTS blueprints (design_id TEXT PRIMARY KEY, payload TEXT)")
 
 app.mount("/storage", StaticFiles(directory=STORAGE_DIR), name="storage")
+app.mount("/assets", StaticFiles(directory=os.path.join(PROJECT_ROOT, "frontend", "assets")), name="assets")
+
 
 @app.on_event("startup")
 async def startup_event():
