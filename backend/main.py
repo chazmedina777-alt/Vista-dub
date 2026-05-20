@@ -192,4 +192,8 @@ async def process_and_mail_order(design_id: str, payload: OrderSubmissionRequest
 
 @app.get("/")
 async def serve_frontend_index():
-    return FileResponse(FRONTEND_FILE)
+    response = FileResponse(FRONTEND_FILE)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
