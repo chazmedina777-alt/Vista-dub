@@ -519,13 +519,49 @@
                 }
             },
             "hoodie": {
-                resolveBackground: (id) => `assets/mockups/mockup_hoodie_1779215778184.png`,
+                resolveBackground: (id, surface) => surface === 'back' ? `assets/mockups/mockup_hoodie_back.png` : `assets/mockups/mockup_hoodie.png`,
                 fallbackAsset: "assets/mockups/mockup_hoodie_1779215778184.png",
-                bgSize: "cover",
+                bgSize: "contain",
                 geometry: "plane",
-                canvasSetup: (canvas, frame) => { 
+                canvasSetup: (canvas, frame, surface) => { 
                     canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
-                    frame.style.padding = "180px 100px 120px 100px"; 
+                    frame.style.padding = "0px";
+                    
+                    let chestLeft, chestTop, chestWidth, chestHeight;
+                    if (surface === 'back') {
+                        chestWidth = canvas.width * 0.34;
+                        chestHeight = canvas.height * 0.38;
+                        chestTop = canvas.height * 0.28;
+                        chestLeft = (canvas.width - chestWidth) / 2;
+                    } else {
+                        chestWidth = canvas.width * 0.34;
+                        chestHeight = canvas.height * 0.30;
+                        chestTop = canvas.height * 0.32;
+                        chestLeft = (canvas.width - chestWidth) / 2;
+                    }
+                    
+                    const chestClip = new fabric.Rect({
+                        left: chestLeft,
+                        top: chestTop,
+                        width: chestWidth,
+                        height: chestHeight,
+                        absolutePositioned: true
+                    });
+                    canvas.clipPath = chestClip;
+                    
+                    canvas.__tshirtChest = { left: chestLeft, top: chestTop, width: chestWidth, height: chestHeight };
+                    
+                    canvas.on('object:moving', function(e) {
+                        if (!canvas.__tshirtChest) return;
+                        const obj = e.target;
+                        if (!obj.selectable) return;
+                        const bounds = obj.getBoundingRect();
+                        const zone = canvas.__tshirtChest;
+                        if (bounds.left < zone.left) obj.left = zone.left + (obj.left - bounds.left);
+                        if (bounds.top < zone.top) obj.top = zone.top + (obj.top - bounds.top);
+                        if (bounds.left + bounds.width > zone.left + zone.width) obj.left = zone.left + zone.width - bounds.width + (obj.left - bounds.left);
+                        if (bounds.top + bounds.height > zone.top + zone.height) obj.top = zone.top + zone.height - bounds.height + (obj.top - bounds.top);
+                    });
                 }
             },
             "pen": {
@@ -736,8 +772,8 @@
         function drawPrintGuidelines() {
             if (activeProductKey === 'door_hanger') return;
             
-            // --- T-SHIRT: Localized chest-area bounding box ---
-            if (activeProductKey === 't_shirt') {
+            // --- APPAREL: Localized chest-area bounding box ---
+            if (activeProductKey === 't_shirt' || activeProductKey === 'hoodie') {
                 const chestWidth = canvas.__tshirtChest ? canvas.__tshirtChest.width : canvas.width * 0.36;
                 const chestHeight = canvas.__tshirtChest ? canvas.__tshirtChest.height : canvas.height * 0.47;
                 const chestLeft = canvas.__tshirtChest ? canvas.__tshirtChest.left : canvas.width * 0.32;
