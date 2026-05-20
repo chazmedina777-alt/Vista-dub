@@ -357,13 +357,48 @@
                 }
             },
             "jacket": {
-                resolveBackground: (id) => `assets/mockups/mockup_jacket.png`,
+                resolveBackground: (id, surface) => surface === 'back' ? `assets/mockups/mockup_jacket_back.png` : `assets/mockups/mockup_jacket.png`,
                 fallbackAsset: "assets/mockups/mockup_tshirt_1779214569967.png",
                 bgSize: "cover",
                 geometry: "plane",
-                canvasSetup: (canvas, frame) => { 
+                canvasSetup: (canvas, frame, surface) => { 
                     canvas.setBackgroundColor('rgba(255,255,255,0)', canvas.renderAll.bind(canvas));
-                    frame.style.padding = "160px 120px"; 
+                    frame.style.padding = "0px";
+                    
+                    let left, top, width, height;
+                    if (surface === 'back') {
+                        width = canvas.width * 0.36;
+                        height = canvas.height * 0.44;
+                        top = canvas.height * 0.28;
+                        left = (canvas.width - width) / 2;
+                    } else {
+                        width = canvas.width * 0.28;
+                        height = canvas.height * 0.25;
+                        top = canvas.height * 0.35;
+                        left = (canvas.width - width) / 2;
+                    }
+                    
+                    const clip = new fabric.Rect({
+                        left: left,
+                        top: top,
+                        width: width,
+                        height: height,
+                        absolutePositioned: true
+                    });
+                    canvas.clipPath = clip;
+                    canvas.__tshirtChest = { left, top, width, height };
+                    
+                    canvas.on('object:moving', function(e) {
+                        if (!canvas.__tshirtChest) return;
+                        const obj = e.target;
+                        if (!obj.selectable) return;
+                        const bounds = obj.getBoundingRect();
+                        const zone = canvas.__tshirtChest;
+                        if (bounds.left < zone.left) obj.left = zone.left + (obj.left - bounds.left);
+                        if (bounds.top < zone.top) obj.top = zone.top + (obj.top - bounds.top);
+                        if (bounds.left + bounds.width > zone.left + zone.width) obj.left = zone.left + zone.width - bounds.width + (obj.left - bounds.left);
+                        if (bounds.top + bounds.height > zone.top + zone.height) obj.top = zone.top + zone.height - bounds.height + (obj.top - bounds.top);
+                    });
                 }
             },
             "hat_beanie": {
@@ -811,7 +846,7 @@
             if (activeProductKey === 'door_hanger') return;
             
             // --- APPAREL & MERCH: Localized print-area bounding box ---
-            if (activeProductKey === 't_shirt' || activeProductKey === 'hoodie' || activeProductKey === 'mug_ceramic') {
+            if (activeProductKey === 't_shirt' || activeProductKey === 'hoodie' || activeProductKey === 'jacket' || activeProductKey === 'mug_ceramic') {
                 const chestWidth = canvas.__tshirtChest ? canvas.__tshirtChest.width : canvas.width * 0.36;
                 const chestHeight = canvas.__tshirtChest ? canvas.__tshirtChest.height : canvas.height * 0.47;
                 const chestLeft = canvas.__tshirtChest ? canvas.__tshirtChest.left : canvas.width * 0.32;
