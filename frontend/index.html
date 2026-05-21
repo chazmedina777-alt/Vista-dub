@@ -83,18 +83,19 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
             opacity: 1;
         }
-        .gallery-card img {
+        .gallery-card img, .gallery-card svg {
             width: 100%;
             height: 90px;
             object-fit: cover;
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
         }
         .gallery-card:hover {
             border-color: #00a2ff !important;
             transform: translateY(-6px);
             box-shadow: 0 10px 20px rgba(0, 162, 255, 0.2);
         }
-        .gallery-card:hover img {
+        .gallery-card:hover img, .gallery-card:hover svg {
             transform: scale(1.08);
         }
         .gallery-card.active {
@@ -203,77 +204,11 @@
             <button class="filter-pill" onclick="filterGallery('apparel', this)">👕 Apparel</button>
             <button class="filter-pill" onclick="filterGallery('marketing', this)">📄 Marketing</button>
             <button class="filter-pill" onclick="filterGallery('swag_drink', this)">🎁 Swag & Drinkware</button>
+            <button class="filter-pill" onclick="filterGallery('signage', this)">🪧 Signage</button>
         </div>
         
         <div class="product-gallery-grid">
-            <div class="gallery-card active" data-category="marketing" data-product-key="business_card" onclick="changeProduct('business_card')">
-                <img src="assets/mockups/mockup_businesscard_1779214596692.png">
-                <div class="gallery-card-title">Business Card</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="t_shirt" onclick="changeProduct('t_shirt')">
-                <img src="assets/mockups/mockup_tshirt_1779214569967.png">
-                <div class="gallery-card-title">T-Shirt</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="polo_shirt" onclick="changeProduct('polo_shirt')">
-                <img src="assets/mockups/mockup_polo_shirt.png">
-                <div class="gallery-card-title">Polo Shirt</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="hoodie" onclick="changeProduct('hoodie')">
-                <img src="assets/mockups/mockup_hoodie_1779215778184.png">
-                <div class="gallery-card-title">Hoodie</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="jacket" onclick="changeProduct('jacket')">
-                <img src="assets/mockups/mockup_jacket.png">
-                <div class="gallery-card-title">Jacket</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="hat_cap" onclick="changeProduct('hat_cap')">
-                <img src="assets/mockups/mockup_hat_cap_1779215761158.png">
-                <div class="gallery-card-title">Cap</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="hat_beanie" onclick="changeProduct('hat_beanie')">
-                <img src="assets/mockups/mockup_hat_beanie.png">
-                <div class="gallery-card-title">Beanie</div>
-            </div>
-            <div class="gallery-card" data-category="swag_drink" data-product-key="mug_ceramic" onclick="changeProduct('mug_ceramic')">
-                <img src="assets/mockups/mockup_mug_1779214583499.png">
-                <div class="gallery-card-title">Ceramic Mug</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="tote_bag" onclick="changeProduct('tote_bag')">
-                <img src="assets/mockups/mockup_tote_bag.png">
-                <div class="gallery-card-title">Tote Bag</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="backpack_drawstring" onclick="changeProduct('backpack_drawstring')">
-                <img src="assets/mockups/mockup_backpack_drawstring.png">
-                <div class="gallery-card-title">Drawstring Backpack</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="safety_vest" onclick="changeProduct('safety_vest')">
-                <img src="assets/mockups/mockup_safety_vest.png">
-                <div class="gallery-card-title">Safety Vest</div>
-            </div>
-            <div class="gallery-card" data-category="apparel" data-product-key="apron" onclick="changeProduct('apron')">
-                <img src="assets/mockups/mockup_apron.png">
-                <div class="gallery-card-title">Apron</div>
-            </div>
-            <div class="gallery-card" data-category="marketing" data-product-key="poster" onclick="changeProduct('poster')">
-                <img src="assets/mockups/mockup_poster_1779214608945.png">
-                <div class="gallery-card-title">Poster</div>
-            </div>
-            <div class="gallery-card" data-category="marketing" data-product-key="door_hanger" onclick="changeProduct('door_hanger')">
-                <img src="assets/mockups/mockup_door_hanger.png">
-                <div class="gallery-card-title">Door Hanger</div>
-            </div>
-            <div class="gallery-card" data-category="marketing" data-product-key="card_rack" onclick="changeProduct('card_rack')">
-                <img src="assets/mockups/mockup_card_rack.png">
-                <div class="gallery-card-title">Card Rack</div>
-            </div>
-            <div class="gallery-card" data-category="swag_drink" data-product-key="pen" onclick="changeProduct('pen')">
-                <img src="assets/mockups/mockup_pen_1779215810717.png">
-                <div class="gallery-card-title">Pen</div>
-            </div>
-            <div class="gallery-card" data-category="swag_drink" data-product-key="usb_drive" onclick="changeProduct('usb_drive')">
-                <img src="assets/mockups/mockup_usb_drive_1779215822877.png">
-                <div class="gallery-card-title">USB Drive</div>
-            </div>
+            <!-- Populated dynamically via initProductGallery() -->
         </div>
 
         <h2 class="user-guide-banner">🎨 Design your Custom Business Card below:</h2>
@@ -868,6 +803,146 @@
         let BLEED_IN = currentProduct.bleed;
         let bleedPx = BLEED_IN * DISPLAY_DPI;
 
+        const MOCKUP_ASSETS = {
+            business_card: "assets/mockups/mockup_businesscard_1779214596692.png",
+            t_shirt: "assets/mockups/mockup_tshirt_1779214569967.png",
+            polo_shirt: "assets/mockups/mockup_polo_shirt.png",
+            hoodie: "assets/mockups/mockup_hoodie_1779215778184.png",
+            jacket: "assets/mockups/mockup_jacket.png",
+            hat_cap: "assets/mockups/mockup_hat_cap_1779215761158.png",
+            hat_beanie: "assets/mockups/mockup_hat_beanie.png",
+            mug_ceramic: "assets/mockups/mockup_mug_1779214583499.png",
+            tote_bag: "assets/mockups/mockup_tote_bag.png",
+            backpack_drawstring: "assets/mockups/mockup_backpack_drawstring.png",
+            safety_vest: "assets/mockups/mockup_safety_vest.png",
+            apron: "assets/mockups/mockup_apron.png",
+            poster: "assets/mockups/mockup_poster_1779214608945.png",
+            door_hanger: "assets/mockups/mockup_door_hanger.png",
+            card_rack: "assets/mockups/mockup_card_rack.png",
+            pen: "assets/mockups/mockup_pen_1779215810717.png",
+            usb_drive: "assets/mockups/mockup_usb_drive_1779215822877.png"
+        };
+
+        function generateSVGBlueprint(key, prod) {
+            const width = prod.width;
+            const height = prod.height;
+            const bleed = prod.bleed || 0;
+            const name = prod.name;
+            const category = prod.category;
+            
+            const boxW = 150;
+            const boxH = 90;
+            const aspect = width / height;
+            
+            let drawW = 100;
+            let drawH = 50;
+            const maxAspect = drawW / drawH;
+            
+            if (aspect > maxAspect) {
+                drawH = drawW / aspect;
+            } else {
+                drawW = drawH * aspect;
+            }
+            
+            drawW = Math.max(15, drawW);
+            drawH = Math.max(10, drawH);
+            
+            const drawX = (boxW - drawW) / 2;
+            const drawY = (boxH - drawH) / 2 - 4;
+            
+            const scaleFactor = drawW / width;
+            const scaledBleed = bleed * scaleFactor;
+            
+            let svg = `<svg viewBox="0 0 ${boxW} ${boxH}" style="width:100%; height:100%; display:block; background:#121218;">
+                <defs>
+                    <pattern id="grid-${key}" width="6" height="6" patternUnits="userSpaceOnUse">
+                        <path d="M 6 0 L 0 0 0 6" fill="none" stroke="rgba(0, 162, 255, 0.07)" stroke-width="0.5"/>
+                    </pattern>
+                    <linearGradient id="blueGrad-${key}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(0, 122, 204, 0.25)" />
+                        <stop offset="100%" stop-color="rgba(0, 242, 255, 0.05)" />
+                    </linearGradient>
+                </defs>
+                
+                <rect width="100%" height="100%" fill="url(#grid-${key})" />
+                <line x1="10" y1="45" x2="140" y2="45" stroke="rgba(0, 162, 255, 0.03)" stroke-width="0.5" />
+                <line x1="75" y1="10" x2="75" y2="80" stroke="rgba(0, 162, 255, 0.03)" stroke-width="0.5" />
+                
+                <g transform="translate(138, 12)" stroke="rgba(0, 242, 255, 0.3)" stroke-width="0.5" fill="none">
+                    <circle cx="0" cy="0" r="3" />
+                    <line x1="-5" y1="0" x2="5" y2="0" />
+                    <line x1="0" y1="-5" x2="0" y2="5" />
+                </g>
+                
+                <text x="8" y="12" fill="rgba(0, 242, 255, 0.5)" font-family="'IBM Plex Mono', monospace" font-size="4.5" font-weight="bold" letter-spacing="0.5">PRE-PRESS blueprint</text>
+                <text x="8" y="18" fill="rgba(255, 255, 255, 0.25)" font-family="Helvetica, Arial, sans-serif" font-size="4" font-weight="500">${category}</text>
+                <rect x="${drawX}" y="${drawY}" width="${drawW}" height="${drawH}" rx="2" fill="url(#blueGrad-${key})" stroke="#00a2ff" stroke-width="0.8" />`;
+            
+            if (bleed > 0 && drawW - scaledBleed * 2 > 0 && drawH - scaledBleed * 2 > 0) {
+                svg += `<rect x="${drawX + scaledBleed}" y="${drawY + scaledBleed}" width="${drawW - scaledBleed * 2}" height="${drawH - scaledBleed * 2}" rx="1" fill="none" stroke="#28a745" stroke-dasharray="1.5,1.5" stroke-width="0.6" opacity="0.7" />`;
+            }
+            
+            const dimY = drawY + drawH + 5;
+            svg += `<line x1="${drawX}" y1="${dimY}" x2="${drawX + drawW}" y2="${dimY}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
+                <line x1="${drawX}" y1="${dimY - 2}" x2="${drawX}" y2="${dimY + 2}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
+                <line x1="${drawX + drawW}" y1="${dimY - 2}" x2="${drawX + drawW}" y2="${dimY + 2}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
+                <text x="${drawX + drawW/2}" y="${dimY + 7}" fill="#00f2ff" font-family="'IBM Plex Mono', monospace" font-size="5" text-anchor="middle" font-weight="bold" opacity="0.9">${width}"</text>`;
+            
+            const dimX = drawX + drawW + 5;
+            svg += `<line x1="${dimX}" y1="${drawY}" x2="${dimX}" y2="${drawY + drawH}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
+                <line x1="${dimX - 2}" y1="${drawY}" x2="${dimX + 2}" y2="${drawY}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
+                <line x1="${dimX - 2}" y1="${drawY + drawH}" x2="${dimX + 2}" y2="${drawY + drawH}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
+                <text x="${dimX + 4}" y="${drawY + drawH/2 + 1.5}" fill="#00f2ff" font-family="'IBM Plex Mono', monospace" font-size="5" font-weight="bold" opacity="0.9">${height}"</text>`;
+            
+            svg += `</svg>`;
+            return svg;
+        }
+
+        function initProductGallery() {
+            const grid = document.querySelector('.product-gallery-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            for (const [key, prod] of Object.entries(PRODUCT_CATALOG)) {
+                let galleryCat = 'swag_drink';
+                if (prod.category === 'MARKETING & PRINT') {
+                    galleryCat = 'marketing';
+                } else if (prod.category === 'APPAREL & WEARABLES') {
+                    galleryCat = 'apparel';
+                } else if (prod.category === 'SIGNAGE & LARGE FORMAT') {
+                    galleryCat = 'signage';
+                } else if (prod.category === 'DRINKWARE' || prod.category === 'SWAG & STATIONERY') {
+                    galleryCat = 'swag_drink';
+                }
+                
+                const card = document.createElement('div');
+                card.className = 'gallery-card';
+                if (key === activeProductKey) {
+                    card.classList.add('active');
+                }
+                card.setAttribute('data-category', galleryCat);
+                card.setAttribute('data-product-key', key);
+                card.setAttribute('onclick', `changeProduct('${key}')`);
+                
+                const mockupUrl = MOCKUP_ASSETS[key];
+                if (mockupUrl) {
+                    const img = document.createElement('img');
+                    img.src = mockupUrl;
+                    img.alt = prod.name;
+                    card.appendChild(img);
+                } else {
+                    card.innerHTML = generateSVGBlueprint(key, prod);
+                }
+                
+                const title = document.createElement('div');
+                title.className = 'gallery-card-title';
+                title.innerText = prod.name;
+                card.appendChild(title);
+                
+                grid.appendChild(card);
+            }
+        }
+
         function initCatalogDropdown() {
             const selector = document.getElementById('product-selector');
             const groups = {};
@@ -1010,6 +1085,7 @@
         window.addEventListener('resize', scaleLayoutResponsive);
         
         initCatalogDropdown();
+        initProductGallery();
         scaleLayoutResponsive();
         
         const canvas = new fabric.Canvas('editor-canvas');
