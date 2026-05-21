@@ -63,9 +63,90 @@
         .proof-img-frame { background: white; padding: 10px; border-radius: 4px; margin: 15px 0; border: 2px dashed #ccc; }
         .proof-img-frame img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
         
-        .gallery-card { transition: transform 0.2s, border-color 0.2s; }
-        .gallery-card:hover { border-color: #00a2ff !important; transform: translateY(-3px); }
-        .gallery-card.active { border-color: #00a2ff !important; box-shadow: 0 0 12px rgba(0, 162, 255, 0.5); transform: translateY(-2px); }
+        .product-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+        
+        .gallery-card {
+            cursor: pointer;
+            border: 2px solid #3e3e4a;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(42, 42, 53, 0.6) 0%, rgba(26, 26, 34, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+        .gallery-card img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gallery-card:hover {
+            border-color: #00a2ff !important;
+            transform: translateY(-6px);
+            box-shadow: 0 10px 20px rgba(0, 162, 255, 0.2);
+        }
+        .gallery-card:hover img {
+            transform: scale(1.08);
+        }
+        .gallery-card.active {
+            border-color: #00a2ff !important;
+            box-shadow: 0 0 20px rgba(0, 162, 255, 0.45);
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(42, 42, 53, 0.8) 0%, rgba(0, 122, 204, 0.15) 100%);
+        }
+        .gallery-card-title {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #e0e0e6;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+        .gallery-card:hover .gallery-card-title, .gallery-card.active .gallery-card-title {
+            color: #00a2ff;
+        }
+        
+        .filter-pill {
+            background: rgba(42, 42, 53, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #a0a0ab;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        .filter-pill:hover {
+            background: rgba(0, 162, 255, 0.15);
+            color: #ffffff;
+            border-color: rgba(0, 162, 255, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0, 162, 255, 0.1);
+        }
+        .filter-pill.active {
+            background: linear-gradient(135deg, #007acc 0%, #00a2ff 100%);
+            color: #ffffff;
+            border-color: #00a2ff;
+            box-shadow: 0 0 16px rgba(0, 162, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
         
         .form-block { display: flex; flex-direction: column; text-align: left; gap: 12px; margin-bottom: 20px; background: #1a1a22; padding: 15px; border-radius: 6px; border: 1px solid #3e3e4a; }
         .form-field { display: flex; flex-direction: column; gap: 5px; }
@@ -117,74 +198,81 @@
             <div class="alert-badge">🔴 Dashed lines mark interior trimmed layout safety limits</div>
         </div>
         
-        <div class="product-gallery" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
-            <div class="gallery-card active" data-product-key="business_card" onclick="changeProduct('business_card')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_businesscard_1779214596692.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Business Card</div>
+        <div class="gallery-filters" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+            <button class="filter-pill active" onclick="filterGallery('all', this)">✨ All Products</button>
+            <button class="filter-pill" onclick="filterGallery('apparel', this)">👕 Apparel</button>
+            <button class="filter-pill" onclick="filterGallery('marketing', this)">📄 Marketing</button>
+            <button class="filter-pill" onclick="filterGallery('swag_drink', this)">🎁 Swag & Drinkware</button>
+        </div>
+        
+        <div class="product-gallery-grid">
+            <div class="gallery-card active" data-category="marketing" data-product-key="business_card" onclick="changeProduct('business_card')">
+                <img src="assets/mockups/mockup_businesscard_1779214596692.png">
+                <div class="gallery-card-title">Business Card</div>
             </div>
-            <div class="gallery-card" data-product-key="t_shirt" onclick="changeProduct('t_shirt')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_tshirt_1779214569967.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-Shirt</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="t_shirt" onclick="changeProduct('t_shirt')">
+                <img src="assets/mockups/mockup_tshirt_1779214569967.png">
+                <div class="gallery-card-title">T-Shirt</div>
             </div>
-            <div class="gallery-card" data-product-key="polo_shirt" onclick="changeProduct('polo_shirt')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_polo_shirt.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Polo Shirt</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="polo_shirt" onclick="changeProduct('polo_shirt')">
+                <img src="assets/mockups/mockup_polo_shirt.png">
+                <div class="gallery-card-title">Polo Shirt</div>
             </div>
-            <div class="gallery-card" data-product-key="hoodie" onclick="changeProduct('hoodie')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_hoodie_1779215778184.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Hoodie</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="hoodie" onclick="changeProduct('hoodie')">
+                <img src="assets/mockups/mockup_hoodie_1779215778184.png">
+                <div class="gallery-card-title">Hoodie</div>
             </div>
-            <div class="gallery-card" data-product-key="jacket" onclick="changeProduct('jacket')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_jacket.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Jacket</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="jacket" onclick="changeProduct('jacket')">
+                <img src="assets/mockups/mockup_jacket.png">
+                <div class="gallery-card-title">Jacket</div>
             </div>
-            <div class="gallery-card" data-product-key="hat_cap" onclick="changeProduct('hat_cap')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_hat_cap_1779215761158.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Cap</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="hat_cap" onclick="changeProduct('hat_cap')">
+                <img src="assets/mockups/mockup_hat_cap_1779215761158.png">
+                <div class="gallery-card-title">Cap</div>
             </div>
-            <div class="gallery-card" data-product-key="hat_beanie" onclick="changeProduct('hat_beanie')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_hat_beanie.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Beanie</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="hat_beanie" onclick="changeProduct('hat_beanie')">
+                <img src="assets/mockups/mockup_hat_beanie.png">
+                <div class="gallery-card-title">Beanie</div>
             </div>
-            <div class="gallery-card" data-product-key="mug_ceramic" onclick="changeProduct('mug_ceramic')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_mug_1779214583499.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Ceramic Mug</div>
+            <div class="gallery-card" data-category="swag_drink" data-product-key="mug_ceramic" onclick="changeProduct('mug_ceramic')">
+                <img src="assets/mockups/mockup_mug_1779214583499.png">
+                <div class="gallery-card-title">Ceramic Mug</div>
             </div>
-            <div class="gallery-card" data-product-key="tote_bag" onclick="changeProduct('tote_bag')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_tote_bag.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Tote Bag</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="tote_bag" onclick="changeProduct('tote_bag')">
+                <img src="assets/mockups/mockup_tote_bag.png">
+                <div class="gallery-card-title">Tote Bag</div>
             </div>
-            <div class="gallery-card" data-product-key="backpack_drawstring" onclick="changeProduct('backpack_drawstring')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_backpack_drawstring.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Drawstring Backpack</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="backpack_drawstring" onclick="changeProduct('backpack_drawstring')">
+                <img src="assets/mockups/mockup_backpack_drawstring.png">
+                <div class="gallery-card-title">Drawstring Backpack</div>
             </div>
-            <div class="gallery-card" data-product-key="safety_vest" onclick="changeProduct('safety_vest')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_safety_vest.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Safety Vest</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="safety_vest" onclick="changeProduct('safety_vest')">
+                <img src="assets/mockups/mockup_safety_vest.png">
+                <div class="gallery-card-title">Safety Vest</div>
             </div>
-            <div class="gallery-card" data-product-key="apron" onclick="changeProduct('apron')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_apron.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Apron</div>
+            <div class="gallery-card" data-category="apparel" data-product-key="apron" onclick="changeProduct('apron')">
+                <img src="assets/mockups/mockup_apron.png">
+                <div class="gallery-card-title">Apron</div>
             </div>
-            <div class="gallery-card" data-product-key="poster" onclick="changeProduct('poster')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_poster_1779214608945.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Poster</div>
+            <div class="gallery-card" data-category="marketing" data-product-key="poster" onclick="changeProduct('poster')">
+                <img src="assets/mockups/mockup_poster_1779214608945.png">
+                <div class="gallery-card-title">Poster</div>
             </div>
-            <div class="gallery-card" data-product-key="door_hanger" onclick="changeProduct('door_hanger')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_door_hanger.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Door Hanger</div>
+            <div class="gallery-card" data-category="marketing" data-product-key="door_hanger" onclick="changeProduct('door_hanger')">
+                <img src="assets/mockups/mockup_door_hanger.png">
+                <div class="gallery-card-title">Door Hanger</div>
             </div>
-            <div class="gallery-card" data-product-key="card_rack" onclick="changeProduct('card_rack')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_card_rack.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Card Rack</div>
+            <div class="gallery-card" data-category="marketing" data-product-key="card_rack" onclick="changeProduct('card_rack')">
+                <img src="assets/mockups/mockup_card_rack.png">
+                <div class="gallery-card-title">Card Rack</div>
             </div>
-            <div class="gallery-card" data-product-key="pen" onclick="changeProduct('pen')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_pen_1779215810717.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Pen</div>
+            <div class="gallery-card" data-category="swag_drink" data-product-key="pen" onclick="changeProduct('pen')">
+                <img src="assets/mockups/mockup_pen_1779215810717.png">
+                <div class="gallery-card-title">Pen</div>
             </div>
-            <div class="gallery-card" data-product-key="usb_drive" onclick="changeProduct('usb_drive')" style="cursor: pointer; min-width: 140px; border: 2px solid #3e3e4a; border-radius: 8px; overflow: hidden; background: #2a2a35;">
-                <img src="assets/mockups/mockup_usb_drive_1779215822877.png" style="width: 100%; height: 90px; object-fit: cover;">
-                <div style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">USB Drive</div>
+            <div class="gallery-card" data-category="swag_drink" data-product-key="usb_drive" onclick="changeProduct('usb_drive')">
+                <img src="assets/mockups/mockup_usb_drive_1779215822877.png">
+                <div class="gallery-card-title">USB Drive</div>
             </div>
         </div>
 
@@ -865,6 +953,33 @@
             
             loadSurfaceElements(currentSurface);
             scaleLayoutResponsive();
+        }
+
+        function filterGallery(category, element) {
+            // Update filter pills active state
+            if (element) {
+                document.querySelectorAll('.filter-pill').forEach(pill => {
+                    pill.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+            
+            // Show/hide gallery cards
+            document.querySelectorAll('.gallery-card').forEach(card => {
+                const cardCat = card.getAttribute('data-category');
+                if (category === 'all' || cardCat === category) {
+                    card.style.display = 'block';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, 15);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         function scaleLayoutResponsive() {
