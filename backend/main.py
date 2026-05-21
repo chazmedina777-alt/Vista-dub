@@ -7,6 +7,7 @@ from io import BytesIO
 import os
 import shutil
 import sqlite3
+import base64
 import json
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -110,7 +111,22 @@ async def save_or_update_design(payload: PrintBlueprint):
             "INSERT OR REPLACE INTO blueprints (design_id, payload) VALUES (?, ?)",
             (design_id, json.dumps(payload.model_dump()))
         )
-    return {"message": "Blueprint verified and saved to SQLite", "design_id": design_id}
+    
+    proof_base64 = None
+    try:
+        pil_image = generate_surface_render(payload, "front", target_dpi=150)
+        buffer = BytesIO()
+        pil_image.save(buffer, format="PNG")
+        proof_bytes = buffer.getvalue()
+        proof_base64 = "data:image/png;base64," + base64.b64encode(proof_bytes).decode("utf-8")
+    except Exception as e:
+        print(f"Error generating proof image: {e}")
+        
+    return {
+        "message": "Blueprint verified and saved to SQLite",
+        "design_id": design_id,
+        "proof_base64": proof_base64
+    }
 
 @app.get("/api/v1/designs/{design_id}/render/{surface_name}")
 async def render_design_surface(design_id: str, surface_name: str, dpi: int = 150):
