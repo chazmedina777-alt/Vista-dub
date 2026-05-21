@@ -75,7 +75,8 @@
             cursor: pointer;
             border: 2px solid #3e3e4a;
             border-radius: 12px;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             background: linear-gradient(135deg, rgba(42, 42, 53, 0.6) 0%, rgba(26, 26, 34, 0.8) 100%);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -89,6 +90,8 @@
             object-fit: cover;
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             display: block;
+            border-radius: 10px 10px 0 0;
+            flex-shrink: 0;
         }
         .gallery-card:hover {
             border-color: #00a2ff !important;
@@ -112,6 +115,7 @@
             color: #e0e0e6;
             letter-spacing: 0.5px;
             transition: color 0.3s ease;
+            flex-shrink: 0;
         }
         .gallery-card:hover .gallery-card-title, .gallery-card.active .gallery-card-title {
             color: #00a2ff;
@@ -805,6 +809,14 @@
 
         const MOCKUP_ASSETS = {
             business_card: "assets/mockups/mockup_businesscard_1779214596692.png",
+            brochure: "assets/mockups/mockup_brochure.png",
+            flyer: "assets/mockups/mockup_flyer.png",
+            postcard_4x6: "assets/mockups/mockup_postcard_4x6.png",
+            postcard_5x7: "assets/mockups/mockup_postcard_5x7.png",
+            folder: "assets/mockups/mockup_folder.png",
+            catalog: "assets/mockups/mockup_catalog.png",
+            menu: "assets/mockups/mockup_menu.png",
+            notepad: "assets/mockups/mockup_notepad.png",
             t_shirt: "assets/mockups/mockup_tshirt_1779214569967.png",
             polo_shirt: "assets/mockups/mockup_polo_shirt.png",
             hoodie: "assets/mockups/mockup_hoodie_1779215778184.png",
@@ -812,15 +824,41 @@
             hat_cap: "assets/mockups/mockup_hat_cap_1779215761158.png",
             hat_beanie: "assets/mockups/mockup_hat_beanie.png",
             mug_ceramic: "assets/mockups/mockup_mug_1779214583499.png",
+            tumbler_travel: "assets/mockups/mockup_tumbler_travel.png",
+            water_bottle: "assets/mockups/mockup_water_bottle.png",
+            glass_pint: "assets/mockups/mockup_glass_pint.png",
+            coaster: "assets/mockups/mockup_coaster.png",
             tote_bag: "assets/mockups/mockup_tote_bag.png",
             backpack_drawstring: "assets/mockups/mockup_backpack_drawstring.png",
             safety_vest: "assets/mockups/mockup_safety_vest.png",
             apron: "assets/mockups/mockup_apron.png",
+            lawn_sign: "assets/mockups/mockup_lawn_sign.png",
+            banner_vinyl: "assets/mockups/mockup_banner_vinyl.png",
+            banner_retractable: "assets/mockups/mockup_banner_retractable.png",
+            sign_a_frame: "assets/mockups/mockup_sign_a_frame.png",
+            decal_car: "assets/mockups/mockup_decal_car.png",
+            magnet_car: "assets/mockups/mockup_magnet_car.png",
             poster: "assets/mockups/mockup_poster_1779214608945.png",
             door_hanger: "assets/mockups/mockup_door_hanger.png",
             card_rack: "assets/mockups/mockup_card_rack.png",
+            foam_board: "assets/mockups/mockup_foam_board.png",
+            tablecloth: "assets/mockups/mockup_tablecloth.png",
+            flag_feather: "assets/mockups/mockup_flag_feather.png",
             pen: "assets/mockups/mockup_pen_1779215810717.png",
-            usb_drive: "assets/mockups/mockup_usb_drive_1779215822877.png"
+            usb_drive: "assets/mockups/mockup_usb_drive_1779215822877.png",
+            keychain: "assets/mockups/mockup_keychain.png",
+            mouse_pad: "assets/mockups/mockup_mouse_pad.png",
+            sticker: "assets/mockups/mockup_sticker.png",
+            magnet_fridge: "assets/mockups/mockup_magnet_fridge.png",
+            phone_case: "assets/mockups/mockup_phone_case.png",
+            lanyard: "assets/mockups/mockup_lanyard.png",
+            stress_ball: "assets/mockups/mockup_stress_ball.png",
+            envelope: "assets/mockups/mockup_envelope.png",
+            calendar: "assets/mockups/mockup_calendar.png",
+            box_shipping: "assets/mockups/mockup_box_shipping.png",
+            greeting_card: "assets/mockups/mockup_greeting_card.png",
+            hang_tag: "assets/mockups/mockup_hang_tag.png",
+            tissue_paper: "assets/mockups/mockup_tissue_paper.png"
         };
 
         function getProductIllustration(key, x, y, w, h) {
@@ -1084,70 +1122,272 @@
             
             const boxW = 150;
             const boxH = 90;
-            const aspect = width / height;
+            const cx = boxW / 2;
+            const cy = boxH / 2 - 3;
             
-            let drawW = 100;
-            let drawH = 50;
-            const maxAspect = drawW / drawH;
-            
-            if (aspect > maxAspect) {
-                drawH = drawW / aspect;
-            } else {
-                drawW = drawH * aspect;
-            }
-            
-            drawW = Math.max(15, drawW);
-            drawH = Math.max(10, drawH);
-            
-            const drawX = (boxW - drawW) / 2;
-            const drawY = (boxH - drawH) / 2 - 4;
-            
-            const scaleFactor = drawW / width;
-            const scaledBleed = bleed * scaleFactor;
-            
-            let svg = `<svg viewBox="0 0 ${boxW} ${boxH}" style="width:100%; height:100%; display:block; background:#121218;">
+            let svg = `<svg viewBox="0 0 ${boxW} ${boxH}" style="width:100%; height:100%; display:block; background: linear-gradient(135deg, #1e1e24 0%, #121216 100%); border-radius:10px;">
                 <defs>
-                    <pattern id="grid-${key}" width="6" height="6" patternUnits="userSpaceOnUse">
-                        <path d="M 6 0 L 0 0 0 6" fill="none" stroke="rgba(0, 162, 255, 0.07)" stroke-width="0.5"/>
-                    </pattern>
-                    <linearGradient id="blueGrad-${key}" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="rgba(0, 122, 204, 0.25)" />
-                        <stop offset="100%" stop-color="rgba(0, 242, 255, 0.05)" />
+                    <filter id="studio-shadow-${key}" x="-30%" y="-30%" width="160%" height="160%">
+                        <feDropShadow dx="1" dy="2.5" stdDeviation="2" flood-color="#000" flood-opacity="0.6" />
+                    </filter>
+                    <linearGradient id="blankMockupGrad-${key}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" />
+                        <stop offset="100%" stop-color="#dedede" />
+                    </linearGradient>
+                    <linearGradient id="metalGrad-${key}" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="rgba(156, 163, 175, 0.95)" />
+                        <stop offset="50%" stop-color="rgba(243, 244, 246, 0.95)" />
+                        <stop offset="100%" stop-color="rgba(107, 114, 128, 0.95)" />
+                    </linearGradient>
+                    <linearGradient id="shadowGrad-${key}" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(0,0,0,0.55)" />
+                        <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+                    </linearGradient>
+                    <radialGradient id="ballGrad-${key}" cx="35%" cy="35%" r="65%">
+                        <stop offset="0%" stop-color="#ffffff" />
+                        <stop offset="55%" stop-color="#e5e7eb" />
+                        <stop offset="100%" stop-color="#71717a" />
+                    </radialGradient>
+                    <linearGradient id="cardboardGrad-${key}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e3c2a6" />
+                        <stop offset="100%" stop-color="#b89474" />
                     </linearGradient>
                 </defs>
                 
-                <rect width="100%" height="100%" fill="url(#grid-${key})" />
-                <line x1="10" y1="45" x2="140" y2="45" stroke="rgba(0, 162, 255, 0.03)" stroke-width="0.5" />
-                <line x1="75" y1="10" x2="75" y2="80" stroke="rgba(0, 162, 255, 0.03)" stroke-width="0.5" />
+                <!-- Studio Floor Soft Shadow -->
+                <ellipse cx="${cx}" cy="${boxH - 12}" rx="55" ry="6.5" fill="url(#shadowGrad-${key})" opacity="0.75" />
                 
-                <g transform="translate(138, 12)" stroke="rgba(0, 242, 255, 0.3)" stroke-width="0.5" fill="none">
-                    <circle cx="0" cy="0" r="3" />
-                    <line x1="-5" y1="0" x2="5" y2="0" />
-                    <line x1="0" y1="-5" x2="0" y2="5" />
-                </g>
-                
-                <text x="8" y="12" fill="rgba(0, 242, 255, 0.5)" font-family="'IBM Plex Mono', monospace" font-size="4.5" font-weight="bold" letter-spacing="0.5">PRE-PRESS blueprint</text>
-                <text x="8" y="18" fill="rgba(255, 255, 255, 0.25)" font-family="Helvetica, Arial, sans-serif" font-size="4" font-weight="500">${category}</text>
-                <rect x="${drawX}" y="${drawY}" width="${drawW}" height="${drawH}" rx="2" fill="url(#blueGrad-${key})" stroke="#00a2ff" stroke-width="0.8" />`;
-            
-            // Add custom illustrative vector graphics centered inside the card
-            svg += getProductIllustration(key, drawX, drawY, drawW, drawH);
-            
+                <g filter="url(#studio-shadow-${key})">`;
+
+            // Draw custom high-fidelity SVG shapes based on the product key
+            switch (key) {
+                case 'banner_retractable':
+                    svg += `
+                    <!-- Retractable Stand Mockup -->
+                    <rect x="74.5" y="10" width="1" height="62" fill="#4b5563" />
+                    <rect x="64" y="10" width="22" height="62" rx="0.5" fill="url(#blankMockupGrad-${key})" />
+                    <rect x="61" y="71" width="28" height="4.5" rx="0.8" fill="url(#metalGrad-${key})" />
+                    <rect x="56" y="75" width="38" height="1.5" rx="0.5" fill="url(#metalGrad-${key})" />
+                    `;
+                    break;
+                case 'sign_a_frame':
+                    svg += `
+                    <!-- A-Frame Sign Mockup -->
+                    <polygon points="56,76 59,20 62,20 59,76" fill="#4b5563" />
+                    <polygon points="94,76 91,20 88,20 91,76" fill="#4b5563" />
+                    <polygon points="58,20 92,20 92,23 58,23" fill="#374151" />
+                    <polygon points="61,22 89,22 87,70 63,70" fill="url(#blankMockupGrad-${key})" />
+                    <polygon points="61,22 89,22 87,27 63,27" fill="rgba(0,0,0,0.06)" />
+                    `;
+                    break;
+                case 'decal_car':
+                    svg += `
+                    <!-- Car Decal Mockup -->
+                    <path d="M 42,64 L 54,24 Q 75,20 108,24 L 98,64 Z" fill="#1f2937" stroke="#4b5563" stroke-width="1.2" />
+                    <path d="M 50,27 L 100,27 L 90,37 L 46,37 Z" fill="rgba(255,255,255,0.06)" />
+                    <circle cx="71" cy="44" r="10" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="1,1" />
+                    <path d="M 64,44 L 78,44 M 71,37 L 71,51" stroke="#ffffff" stroke-width="1.5" />
+                    `;
+                    break;
+                case 'magnet_car':
+                    svg += `
+                    <!-- Car Magnet Mockup -->
+                    <rect x="35" y="20" width="80" height="48" rx="4" fill="#0f172a" />
+                    <line x1="35" y1="44" x2="115" y2="44" stroke="#1e293b" stroke-width="0.8" />
+                    <rect x="42" y="30" width="10" height="2" rx="0.5" fill="#64748b" />
+                    <rect x="52" y="34" width="46" height="23" rx="1" fill="url(#blankMockupGrad-${key})" stroke="rgba(0,0,0,0.1)" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'foam_board':
+                    svg += `
+                    <!-- Foam Board Easel Mockup -->
+                    <line x1="75" y1="12" x2="58" y2="78" stroke="#78350f" stroke-width="1.6" />
+                    <line x1="75" y1="12" x2="92" y2="78" stroke="#78350f" stroke-width="1.6" />
+                    <line x1="75" y1="12" x2="75" y2="78" stroke="#451a03" stroke-width="1.2" />
+                    <line x1="50" y1="56" x2="100" y2="56" stroke="#78350f" stroke-width="2.2" />
+                    <rect x="54" y="20" width="42" height="32" rx="0.5" fill="url(#blankMockupGrad-${key})" stroke="#d1d5db" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'tablecloth':
+                    svg += `
+                    <!-- Tablecloth Mockup -->
+                    <rect x="42" y="44" width="66" height="4" fill="#374151" />
+                    <path d="M 40,44 L 43,76 Q 48,78 52,76 L 56,44 Z" fill="#f3f4f6" />
+                    <path d="M 54,44 L 57,78 Q 63,80 68,78 L 70,44 Z" fill="#e5e7eb" />
+                    <path d="M 68,44 L 70,78 Q 78,80 82,78 L 84,44 Z" fill="#f3f4f6" />
+                    <path d="M 82,44 L 85,76 Q 90,78 94,76 L 98,44 Z" fill="#e5e7eb" />
+                    <path d="M 94,44 L 98,75 Q 104,77 108,75 L 110,44 Z" fill="#f3f4f6" />
+                    <polygon points="35,44 115,44 108,36 42,36" fill="url(#blankMockupGrad-${key})" stroke="#d1d5db" stroke-width="0.3" />
+                    `;
+                    break;
+                case 'flag_feather':
+                    svg += `
+                    <!-- Feather Flag Mockup -->
+                    <line x1="66" y1="78" x2="66" y2="74" stroke="#6b7280" stroke-width="1.5" />
+                    <path d="M 66,74 Q 66,10 84,14" fill="none" stroke="#4b5563" stroke-width="1.2" />
+                    <path d="M 66,71 Q 81,67 77,39 Q 74,15 84,14 Q 66,13 66,24 Z" fill="url(#blankMockupGrad-${key})" stroke="rgba(0,0,0,0.06)" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'keychain':
+                    svg += `
+                    <!-- Keychain Mockup -->
+                    <circle cx="75" cy="24" r="7.5" fill="none" stroke="url(#metalGrad-${key})" stroke-width="1.8" />
+                    <circle cx="75" cy="33.5" r="3" fill="none" stroke="url(#metalGrad-${key})" stroke-width="1.2" />
+                    <rect x="63" y="37" width="24" height="36" rx="3.5" fill="url(#blankMockupGrad-${key})" stroke="#e5e7eb" stroke-width="0.5" />
+                    <circle cx="75" cy="42" r="2.2" fill="#e5e7eb" stroke="#cbd5e1" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'mouse_pad':
+                    svg += `
+                    <!-- Mouse Pad Mockup -->
+                    <rect x="40" y="21" width="70" height="48" rx="6.5" fill="url(#blankMockupGrad-${key})" stroke="#d1d5db" stroke-width="0.4" />
+                    <rect x="39.5" y="20.5" width="71" height="49" rx="7" fill="none" stroke="#1f2937" stroke-width="1.2" opacity="0.8" />
+                    <rect x="42.5" y="23.5" width="65" height="43" rx="5" fill="none" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="1.2,1.2" />
+                    `;
+                    break;
+                case 'sticker':
+                    svg += `
+                    <!-- Sticker Mockup -->
+                    <path d="M 75,19 C 89,19 96,27 96,45 C 96,63 89,71 75,71 C 61,71 54,63 54,45 C 54,27 61,19 75,19 Z" fill="#ffffff" />
+                    <path d="M 75,21 C 87,21 94,28 94,45 C 94,62 87,69 75,69 C 63,69 56,62 56,45 C 56,28 63,21 75,21 Z" fill="#f9fafb" stroke="#f3f4f6" stroke-width="0.5" />
+                    <path d="M 87,62 L 95,61 C 94,64 91,67 87,68 Z" fill="#e5e7eb" stroke="#cbd5e1" stroke-width="0.3" />
+                    `;
+                    break;
+                case 'magnet_fridge':
+                    svg += `
+                    <!-- Fridge Magnet Mockup -->
+                    <rect x="20" y="12" width="110" height="66" fill="url(#metalGrad-${key})" rx="1.5" />
+                    <rect x="30" y="12" width="4" height="66" fill="#4b5563" opacity="0.3" />
+                    <rect x="52" y="25" width="46" height="35" rx="3" fill="url(#blankMockupGrad-${key})" stroke="#e5e7eb" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'phone_case':
+                    svg += `
+                    <!-- Phone Case Mockup -->
+                    <rect x="59" y="15" width="32" height="60" rx="5.5" fill="#1f2937" />
+                    <rect x="58" y="14" width="34" height="62" rx="6.5" fill="url(#blankMockupGrad-${key})" stroke="#cbd5e1" stroke-width="0.5" />
+                    <rect x="63" y="20" width="9" height="11" rx="1.5" fill="#111827" />
+                    <circle cx="66" cy="23" r="1.3" fill="#374151" />
+                    <circle cx="70" cy="23" r="1.3" fill="#374151" />
+                    <circle cx="68" cy="27" r="1.5" fill="#374151" />
+                    `;
+                    break;
+                case 'lanyard':
+                    svg += `
+                    <!-- Lanyard Mockup -->
+                    <path d="M 65,10 L 73.5,62 L 75.5,62 L 69,10 Z" fill="#f3f4f6" />
+                    <path d="M 85,10 L 76.5,62 L 74.5,62 L 81,10 Z" fill="#e5e7eb" />
+                    <rect x="73.5" y="60" width="3" height="3.5" fill="url(#metalGrad-${key})" />
+                    <circle cx="75" cy="66" r="2.2" fill="none" stroke="url(#metalGrad-${key})" stroke-width="1.2" />
+                    <line x1="75" y1="67.5" x2="75" y2="73" stroke="url(#metalGrad-${key})" stroke-width="1.2" />
+                    `;
+                    break;
+                case 'stress_ball':
+                    svg += `
+                    <!-- Stress Ball Mockup -->
+                    <ellipse cx="${cx}" cy="68" rx="14" ry="3.5" fill="rgba(0,0,0,0.15)" />
+                    <circle cx="${cx}" cy="44" r="21" fill="url(#ballGrad-${key})" stroke="rgba(0,0,0,0.05)" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'envelope':
+                    svg += `
+                    <!-- Envelope Mockup -->
+                    <rect x="35" y="24" width="80" height="42" rx="1" fill="url(#blankMockupGrad-${key})" stroke="#e5e7eb" stroke-width="0.5" />
+                    <polygon points="35,24 75,45 115,24" fill="none" stroke="#cbd5e1" stroke-width="0.5" />
+                    <line x1="35" y1="66" x2="75" y2="45" stroke="#e5e7eb" stroke-width="0.4" />
+                    <line x1="115" y1="66" x2="75" y2="45" stroke="#e5e7eb" stroke-width="0.4" />
+                    `;
+                    break;
+                case 'calendar':
+                    svg += `
+                    <!-- Calendar Mockup -->
+                    <rect x="46" y="16" width="58" height="58" rx="0.5" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="0.5" />
+                    <rect x="48" y="23" width="54" height="49" rx="0.5" fill="url(#blankMockupGrad-${key})" stroke="#e5e7eb" stroke-width="0.3" />
+                    <rect x="50" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="55" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="60" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="65" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="70" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="75" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="80" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="85" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="90" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    <rect x="95" y="13" width="1.2" height="4.5" rx="0.3" fill="url(#metalGrad-${key})" />
+                    `;
+                    break;
+                case 'box_shipping':
+                    svg += `
+                    <!-- Shipping Box Mockup -->
+                    <polygon points="40,43 75,61 75,78 40,60" fill="#cca88a" stroke="#bd987a" stroke-width="0.3" />
+                    <polygon points="75,61 110,43 110,60 75,78" fill="#e0bfab" stroke="#ccaa96" stroke-width="0.3" />
+                    <polygon points="40,43 75,25 110,43 75,61" fill="#edd6c6" stroke="#ccaa96" stroke-width="0.3" />
+                    <polygon points="57.5,33.5 92.5,33.5 92.5,36.5 57.5,36.5" fill="#a16207" opacity="0.55" />
+                    `;
+                    break;
+                case 'greeting_card':
+                    svg += `
+                    <!-- Greeting Card Mockup -->
+                    <polygon points="45,25 75,32 75,65 45,58" fill="#e5e7eb" stroke="#cbd5e1" stroke-width="0.4" />
+                    <polygon points="75,32 105,22 105,55 75,65" fill="url(#blankMockupGrad-${key})" stroke="#e5e7eb" stroke-width="0.4" />
+                    `;
+                    break;
+                case 'hang_tag':
+                    svg += `
+                    <!-- Hang Tag Mockup -->
+                    <polygon points="63,20 87,20 87,66 63,66" fill="url(#blankMockupGrad-${key})" stroke="#cbd5e1" stroke-width="0.5" />
+                    <circle cx="75" cy="26" r="1.8" fill="none" stroke="url(#metalGrad-${key})" stroke-width="1.2" />
+                    <path d="M 75,25 Q 75,10 66,12 M 75,25 Q 75,10 84,12" fill="none" stroke="#78350f" stroke-width="0.5" />
+                    `;
+                    break;
+                case 'tissue_paper':
+                    svg += `
+                    <!-- Tissue Paper Mockup -->
+                    <polygon points="38,20 112,24 107,68 43,66" fill="url(#blankMockupGrad-${key})" stroke="#cbd5e1" stroke-width="0.4" />
+                    <path d="M 38,20 Q 58,35 73,30 Q 93,25 107,68 M 43,66 Q 63,55 78,60 Q 93,65 112,24" fill="none" stroke="#d1d5db" stroke-width="0.3" />
+                    `;
+                    break;
+                default:
+                    const drawW_def = Math.max(20, Math.min(100, 150 * (width / Math.max(1, height))));
+                    const drawH_def = Math.max(15, Math.min(60, 90 * (height / Math.max(1, width))));
+                    const dx = (boxW - drawW_def) / 2;
+                    const dy = (boxH - drawH_def) / 2 - 4;
+                    svg += `<rect x="${dx}" y="${dy}" width="${drawW_def}" height="${drawH_def}" rx="3" fill="url(#blankMockupGrad-${key})" stroke="#d1d5db" stroke-width="0.5" />`;
+                    break;
+            }
+
+            svg += `</g>`;
+
+            const aspect_dim = width / height;
+            let drawW = 100;
+            let drawH = 50;
+            if (aspect_dim > (drawW / drawH)) {
+                drawH = drawW / aspect_dim;
+            } else {
+                drawW = drawH * aspect_dim;
+            }
+            drawW = Math.max(15, drawW);
+            drawH = Math.max(10, drawH);
+            const drawX = (boxW - drawW) / 2;
+            const drawY = (boxH - drawH) / 2 - 4;
+
+            const scaleFactor = drawW / width;
+            const scaledBleed = bleed * scaleFactor;
+
             if (bleed > 0 && drawW - scaledBleed * 2 > 0 && drawH - scaledBleed * 2 > 0) {
-                svg += `<rect x="${drawX + scaledBleed}" y="${drawY + scaledBleed}" width="${drawW - scaledBleed * 2}" height="${drawH - scaledBleed * 2}" rx="1" fill="none" stroke="#28a745" stroke-dasharray="1.5,1.5" stroke-width="0.6" opacity="0.7" />`;
+                svg += `<rect x="${drawX + scaledBleed}" y="${drawY + scaledBleed}" width="${drawW - scaledBleed * 2}" height="${drawH - scaledBleed * 2}" rx="1" fill="none" stroke="#28a745" stroke-dasharray="1.2,1.2" stroke-width="0.5" opacity="0.65" />`;
             }
             
             const dimY = drawY + drawH + 5;
-            svg += `<line x1="${drawX}" y1="${dimY}" x2="${drawX + drawW}" y2="${dimY}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
-                <line x1="${drawX}" y1="${dimY - 2}" x2="${drawX}" y2="${dimY + 2}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
-                <line x1="${drawX + drawW}" y1="${dimY - 2}" x2="${drawX + drawW}" y2="${dimY + 2}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
-                <text x="${drawX + drawW/2}" y="${dimY + 7}" fill="#00f2ff" font-family="'IBM Plex Mono', monospace" font-size="5" text-anchor="middle" font-weight="bold" opacity="0.9">${width}"</text>`;
+            svg += `<line x1="${drawX}" y1="${dimY}" x2="${drawX + drawW}" y2="${dimY}" stroke="#00f2ff" stroke-width="0.5" opacity="0.75" />
+                <line x1="${drawX}" y1="${dimY - 1.5}" x2="${drawX}" y2="${dimY + 1.5}" stroke="#00f2ff" stroke-width="0.5" opacity="0.75" />
+                <line x1="${drawX + drawW}" y1="${dimY - 1.5}" x2="${drawX + drawW}" y2="${dimY + 1.5}" stroke="#00f2ff" stroke-width="0.5" opacity="0.75" />
+                <text x="${drawX + drawW/2}" y="${dimY + 6.5}" fill="#00f2ff" font-family="'IBM Plex Mono', monospace" font-size="4.5" text-anchor="middle" font-weight="bold" opacity="0.8">${width}"</text>`;
             
             const dimX = drawX + drawW + 5;
-            svg += `<line x1="${dimX}" y1="${drawY}" x2="${dimX}" y2="${drawY + drawH}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
-                <line x1="${dimX - 2}" y1="${drawY}" x2="${dimX + 2}" y2="${drawY}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
-                <line x1="${dimX - 2}" y1="${drawY + drawH}" x2="${dimX + 2}" y2="${drawY + drawH}" stroke="#00f2ff" stroke-width="0.6" opacity="0.8" />
-                <text x="${dimX + 4}" y="${drawY + drawH/2 + 1.5}" fill="#00f2ff" font-family="'IBM Plex Mono', monospace" font-size="5" font-weight="bold" opacity="0.9">${height}"</text>`;
+            svg += `<line x1="${dimX}" y1="${drawY}" x2="${dimX}" y2="${drawY + drawH}" stroke="#00f2ff" stroke-width="0.5" opacity="0.75" />
+                <line x1="${dimX - 1.5}" y1="${drawY}" x2="${dimX + 1.5}" y2="${drawY}" stroke="#00f2ff" stroke-width="0.5" opacity="0.75" />
+                <line x1="${dimX - 1.5}" y1="${drawY + drawH}" x2="${dimX + 1.5}" y2="${drawY + drawH}" stroke="#00f2ff" stroke-width="0.5" opacity="0.75" />
+                <text x="${dimX + 3}" y="${drawY + drawH/2 + 1.5}" fill="#00f2ff" font-family="'IBM Plex Mono', monospace" font-size="4.5" font-weight="bold" opacity="0.8">${height}"</text>`;
             
             svg += `</svg>`;
             return svg;
@@ -1180,13 +1420,15 @@
                 card.setAttribute('onclick', `changeProduct('${key}')`);
                 
                 const mockupUrl = MOCKUP_ASSETS[key];
+                const cacheBust = '?v=' + Date.now();
                 if (mockupUrl) {
                     const img = document.createElement('img');
-                    img.src = mockupUrl;
+                    img.src = mockupUrl + cacheBust;
                     img.alt = prod.name;
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                    };
                     card.appendChild(img);
-                } else {
-                    card.innerHTML = generateSVGBlueprint(key, prod);
                 }
                 
                 const title = document.createElement('div');
